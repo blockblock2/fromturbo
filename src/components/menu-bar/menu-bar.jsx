@@ -32,7 +32,6 @@ import FramerateChanger from '../../containers/tw-framerate-changer.jsx';
 import ChangeUsername from '../../containers/tw-change-username.jsx';
 import CloudVariablesToggler from '../../containers/tw-cloud-toggler.jsx';
 import TWSaveStatus from './tw-save-status.jsx';
-import TWNews from './tw-news.jsx';
 
 import {openTipsLibrary, openSettingsModal, openRestorePointModal} from '../../reducers/modals';
 import {setPlayer} from '../../reducers/mode';
@@ -101,6 +100,7 @@ import ninetiesLogo from './nineties_logo.svg';
 import catLogo from './cat_logo.svg';
 import prehistoricLogo from './prehistoric-logo.svg';
 import oldtimeyLogo from './oldtimey-logo.svg';
+import fromturboIcon from '../../fromturbo/brand/icon.svg';
 
 import sharedMessages from '../../lib/shared-messages';
 
@@ -491,6 +491,19 @@ class MenuBar extends React.Component {
                 )}
             >
                 <div className={styles.mainMenu}>
+                    {/* fromturbo: brand mark */}
+                    <div
+                        className={classNames(styles.menuBarItem, styles.fromturboBrand)}
+                        aria-label={APP_NAME}
+                    >
+                        <img
+                            className={styles.fromturboBrandIcon}
+                            src={fromturboIcon}
+                            alt=""
+                            draggable={false}
+                        />
+                        <span className={styles.fromturboBrandName}>{APP_NAME}</span>
+                    </div>
                     <div className={styles.fileGroup}>
                         {this.props.errors.length > 0 && <div>
                             <MenuLabel
@@ -1047,7 +1060,6 @@ class MenuBar extends React.Component {
         return (
             <React.Fragment>
                 {menuBar}
-                <TWNews />
             </React.Fragment>
         );
     }

@@ -1,4 +1,4 @@
-// Example custom extension — the same format TurboWarp uses, so it works in both.
+// Example custom extension in the standard Scratch custom extension format.
 // Add it: Mods → "Add a custom extension" → https://fromturbo.pages.dev/mods/example-extension.js
 // (Choose "Run without sandbox" when asked if you want it to reach the editor.)
 

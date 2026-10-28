@@ -5,6 +5,7 @@ import {api, start, waitFor} from './api';
 import scratchity from './mods/scratchity';
 import colab from './mods/colab';
 import scratchpack from './mods/scratchpack';
+import {rebrandBuiltinBlocks} from './brand';
 
 const BUILT_IN = [scratchity, colab, scratchpack];
 const DOCS_URL = 'mods/';
@@ -25,7 +26,7 @@ const openManager = () => api.ui.openPanel({
         const list = h('div', {className: 'ft-list'});
         const status = h('div', {className: 'ft-muted'});
         const urlInput = h('input', {'type': 'url', 'placeholder': 'https://example.com/my-mod.js', 'aria-label': 'Mod URL'});
-        const extInput = h('input', {'type': 'url', 'placeholder': 'https://extensions.turbowarp.org/…', 'aria-label': 'Extension URL'});
+        const extInput = h('input', {'type': 'url', 'placeholder': 'https://example.com/extension.js', 'aria-label': 'Extension URL'});
 
         const draw = () => {
             list.replaceChildren(...api.mods.list().map(m => {
@@ -91,7 +92,7 @@ const openManager = () => api.ui.openPanel({
             list,
             h('div', {className: 'ft-muted'}, 'Install a mod from a URL'),
             h('div', {className: 'ft-row', style: {flexWrap: 'nowrap'}}, urlInput, install),
-            h('div', {className: 'ft-muted'}, 'Add a custom extension (TurboWarp format) to this project'),
+            h('div', {className: 'ft-muted'}, 'Add a custom extension to this project'),
             h('div', {className: 'ft-row', style: {flexWrap: 'nowrap'}}, extInput, addExt),
             status,
             h('a', {href: DOCS_URL, target: '_blank', rel: 'noopener'}, 'How to make a mod →')
@@ -105,7 +106,10 @@ const boot = async () => {
     window.fromturbo = api;
     for (const mod of BUILT_IN) api.mods.register(mod);
 
-    await waitFor(() => window.vm && window.ReduxStore, 60000);
+    // Rebrand built-in blocks the moment the VM exists, before any project can load them.
+    await waitFor(() => window.vm, 60000);
+    rebrandBuiltinBlocks(window.vm);
+    await waitFor(() => window.ReduxStore, 60000);
     start();
     api.ui.addMenuButton('Mods', openManager, {title: 'Manage fromturbo mods'});
 

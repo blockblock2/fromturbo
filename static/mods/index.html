@@ -38,7 +38,7 @@
 <header>
   <div class="wrap">
     <h1>Making fromturbo mods</h1>
-    <p>Everything TurboWarp does, plus a mod API anyone can use. <a href="../editor.html">Open the editor →</a></p>
+    <p>A fast Scratch editor with a mod API anyone can use. <a href="../editor.html">Open the editor →</a></p>
   </div>
 </header>
 <main>
@@ -97,7 +97,7 @@
 
   <h3>The raw stuff</h3>
   <table>
-    <tr><td><code>api.vm</code></td><td>TurboWarp's Scratch VM (runtime, targets, everything).</td></tr>
+    <tr><td><code>api.vm</code></td><td>The Scratch VM (runtime, targets, everything).</td></tr>
     <tr><td><code>api.blocks</code> / <code>api.workspace</code></td><td>ScratchBlocks (Blockly) and the code area, once the Code tab has loaded.</td></tr>
     <tr><td><code>api.redux</code></td><td>The editor's Redux store.</td></tr>
   </table>
@@ -105,7 +105,7 @@
 
 <section>
   <h2>Custom blocks (extensions)</h2>
-  <p>fromturbo runs the same custom extensions as TurboWarp, so everything on <a href="https://extensions.turbowarp.org/">extensions.turbowarp.org</a> works. Add one from <b>Mods → Add a custom extension</b>, or from the normal extension library.</p>
+  <p>fromturbo runs standard custom extensions, so everything in the extension gallery works. Add one from <b>Mods → Add a custom extension</b>, or from the normal extension library.</p>
   <p>Mods can add blocks without a separate file:</p>
 <pre><code>fromturbo.mods.register({
     id: 'my-blocks',

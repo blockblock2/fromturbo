@@ -23,7 +23,7 @@ const manifest = {
     },
     {
       "type": "warning",
-      "text": "The \"TurboWarp keys\" will only work in TurboWarp, not in Scratch.",
+      "text": "The \"fromturbo keys\" will only work in fromturbo, not in Scratch.",
       "id": "twKeysWarn"
     }
   ],
@@ -44,7 +44,7 @@ const manifest = {
     },
     {
       "dynamic": true,
-      "name": "Show TurboWarp keys",
+      "name": "Show fromturbo keys",
       "id": "twKeys",
       "type": "boolean",
       "default": false

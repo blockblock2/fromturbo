@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="ft-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3d8bff"/>
+      <stop offset="1" stop-color="#1255d6"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#ft-bg)"/>
+  <!-- a Scratch-style command block: notch on top, tab underneath -->
+  <path fill="#ffffff" d="M26 40
+           a8 8 0 0 1 8 -8
+           h10 l6 6 h14 l6 -6
+           h24 a8 8 0 0 1 8 8
+           v40 a8 8 0 0 1 -8 8
+           h-24 l-6 6 h-14 l-6 -6
+           h-10 a8 8 0 0 1 -8 -8 z"/>
+  <!-- turbo chevrons -->
+  <path fill="none" stroke="#1a6cf0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"
+        d="M46 47 l14 13 l-14 13 M66 47 l14 13 l-14 13"/>
+</svg>

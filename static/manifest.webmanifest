@@ -1,7 +1,7 @@
 {
-  "short_name": "TurboWarp",
-  "name": "TurboWarp",
-  "description": "Mod of Scratch 3 with a compiler, dark mode, and more features.",
+  "short_name": "fromturbo",
+  "name": "fromturbo",
+  "description": "Fast Scratch mod with built-in mods, AI block writing and live collaboration.",
   "icons": [
     {
       "src": "images/192.png",
@@ -15,7 +15,7 @@
     }
   ],
   "start_url": "editor",
-  "background_color": "#333333",
+  "background_color": "#1f2a44",
   "display": "standalone",
-  "theme_color": "#333333"
+  "theme_color": "#3d8bff"
 }

@@ -22,7 +22,7 @@ const ACCENT_MAP = {
     [ACCENT_RED]: accentRed,
     [ACCENT_RAINBOW]: accentRainbow
 };
-const ACCENT_DEFAULT = ACCENT_RED;
+const ACCENT_DEFAULT = ACCENT_BLUE; // fromturbo: blue by default
 
 const GUI_LIGHT = 'light';
 const GUI_DARK = 'dark';

@@ -472,9 +472,9 @@ export const galleryMore = {
     description: (
         <FormattedMessage
             // eslint-disable-next-line max-len
-            defaultMessage="Learn more about extensions at extensions.turbowarp.org."
+            defaultMessage="Find more extensions in the extension gallery."
             description="Appears after the extension list from the gallery was loaded successfully"
-            id="tw.extensionGallery.more"
+            id="fromturbo.extensionGallery.more"
         />
     ),
     tags: ['tw'],
@@ -498,9 +498,9 @@ export const galleryError = {
     description: (
         <FormattedMessage
             // eslint-disable-next-line max-len
-            defaultMessage="Error loading extension gallery. Visit extensions.turbowarp.org to find more extensions."
+            defaultMessage="Couldn't load the extension gallery. Check your connection and try again."
             description="Appears when an error occurred loading extension list from the custom extension gallery"
-            id="tw.extensionGallery.error"
+            id="fromturbo.extensionGallery.error"
         />
     ),
     tags: ['tw'],

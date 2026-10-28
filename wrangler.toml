@@ -1,0 +1,7 @@
+name = "fromturbo"
+pages_build_output_dir = "./build"
+compatibility_date = "2026-10-28"
+
+# Scratchity uses Qwen2.5-Coder through Workers AI
+[ai]
+binding = "AI"

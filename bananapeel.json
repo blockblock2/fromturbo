@@ -1,0 +1,11 @@
+{
+  "name": "fromturbo",
+  "title": "fromturbo",
+  "version": "1.0.0",
+  "description": "Fast Scratch editor with Scratchity, Scratch Colab, .scratchpack and community mods built in",
+  "main": "editor.html",
+  "icon": "icon.png",
+  "width": 1280,
+  "height": 820,
+  "dmg": true
+}

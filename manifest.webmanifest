@@ -1,0 +1,21 @@
+{
+  "short_name": "fromturbo",
+  "name": "fromturbo",
+  "description": "Fast Scratch mod with built-in mods, AI block writing and live collaboration.",
+  "icons": [
+    {
+      "src": "images/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "images/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "editor",
+  "background_color": "#1f2a44",
+  "display": "standalone",
+  "theme_color": "#3d8bff"
+}

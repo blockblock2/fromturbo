@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Making fromturbo mods</title>
+<style>
+  :root {
+    --bg: #f7f6fb; --card: #ffffff; --text: #2b2d42; --muted: #6b6f85;
+    --accent: #855cd6; --code-bg: #f0edf8; --border: #e3dff0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15141c; --card: #1f1d29; --text: #ecebf3; --muted: #a3a1b5; --accent: #b393ff; --code-bg: #2a2737; --border: #34304a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  header { background: var(--accent); color: #fff; padding: 32px 16px; }
+  header .wrap, main { max-width: 820px; margin: 0 auto; }
+  header h1 { margin: 0 0 4px; font-size: 32px; }
+  header p { margin: 0; opacity: .9; }
+  header a { color: #fff; }
+  main { padding: 16px; }
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 16px 0; }
+  h2 { margin-top: 0; font-size: 22px; }
+  h3 { margin-bottom: 4px; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font: 14px ui-monospace, Menlo, monospace; }
+  pre { background: var(--code-bg); padding: 14px; border-radius: 8px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, monospace; }
+  pre code { background: none; padding: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td { padding: 6px 8px; border-top: 1px solid var(--border); vertical-align: top; }
+  td:first-child { white-space: nowrap; }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); }
+  .btn { display: inline-block; background: var(--accent); color: #fff; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Making fromturbo mods</h1>
+    <p>A fast Scratch editor with a mod API anyone can use. <a href="../editor.html">Open the editor →</a></p>
+  </div>
+</header>
+<main>
+
+<section>
+  <h2>Your first mod in 30 seconds</h2>
+  <p>A mod is one JavaScript file. It calls <code>fromturbo.mods.register</code> and gets the whole API passed in.</p>
+<pre><code>fromturbo.mods.register({
+    id: 'hello',
+    name: 'Hello',
+    run (api) {
+        return api.ui.addMenuButton('Hello', () => api.ui.toast('Hi from my mod!'));
+    }
+});</code></pre>
+  <p>Host the file anywhere (GitHub Pages, pages.dev, a gist's raw link), then in the editor open <b>Mods</b>, paste the URL and press <b>Install</b>. It loads every time after that.</p>
+  <p>To hand a mod to someone, link them to <code>fromturbo.pages.dev/editor.html?mod=YOUR_URL</code>. They'll be asked before it runs.</p>
+  <p><a class="btn" href="example-mod.js">See the example mod</a></p>
+  <p class="muted">Try it right now from the browser console on the editor page: paste the snippet above and a button appears.</p>
+</section>
+
+<section>
+  <h2>The API</h2>
+  <h3>Project</h3>
+  <table>
+    <tr><td><code>api.project.getJSON()</code></td><td>The project as JSON (no asset files).</td></tr>
+    <tr><td><code>await api.project.getSb3()</code></td><td>The whole project as an <code>.sb3</code> Blob.</td></tr>
+    <tr><td><code>await api.project.load(data, title?)</code></td><td>Open a project from an ArrayBuffer, Blob or project JSON.</td></tr>
+    <tr><td><code>api.project.getTitle()</code> / <code>setTitle(t)</code></td><td>The project title.</td></tr>
+    <tr><td><code>api.project.editingTarget()</code></td><td>The selected sprite (or stage).</td></tr>
+    <tr><td><code>await api.project.addBlocksXML(xml)</code></td><td>Add scripts to the selected sprite from Scratch Blocks XML. Rejects unknown block types.</td></tr>
+  </table>
+
+  <h3>Editor UI</h3>
+  <table>
+    <tr><td><code>api.ui.addMenuButton(label, onClick)</code></td><td>A button in the top menu bar. Returns a function that removes it.</td></tr>
+    <tr><td><code>api.ui.openPanel({id, title, render(body, panel)})</code></td><td>A floating, draggable panel. <code>panel.close()</code> closes it.</td></tr>
+    <tr><td><code>api.ui.toast(message)</code></td><td>A short pop-up message.</td></tr>
+    <tr><td><code>api.ui.h(tag, props, ...children)</code></td><td>Tiny element builder. Use classes <code>ft-btn</code>, <code>ft-quiet</code>, <code>ft-row</code>, <code>ft-muted</code>, <code>ft-item</code> to match the built-in mods.</td></tr>
+    <tr><td><code>api.ui.activateTab(0|1|2)</code></td><td>Switch to Code, Costumes or Sounds.</td></tr>
+  </table>
+
+  <h3>Events — <code>api.on(name, fn)</code> returns an unsubscribe function</h3>
+  <table>
+    <tr><td><code>projectChanged</code></td><td>Anything in the project changed.</td></tr>
+    <tr><td><code>projectLoaded</code></td><td>A project was opened through the API.</td></tr>
+    <tr><td><code>targetsUpdate</code></td><td>Sprites changed or a different sprite was selected.</td></tr>
+    <tr><td><code>workspaceUpdate</code></td><td>The code area was redrawn.</td></tr>
+    <tr><td><code>greenFlag</code> / <code>stop</code></td><td>The project started or stopped.</td></tr>
+    <tr><td><code>blocksAdded</code></td><td>Scripts were added with <code>addBlocksXML</code>.</td></tr>
+    <tr><td><code>modRegistered</code> / <code>modStarted</code></td><td>Another mod appeared or started.</td></tr>
+  </table>
+  <p>Mods can also make their own events with <code>api.emit(name, ...args)</code> so mods can talk to each other.</p>
+
+  <h3>Storage</h3>
+  <p>Your <code>run(api, {storage})</code> gets <code>storage.get(key, fallback)</code> and <code>storage.set(key, value)</code>, saved per mod in the browser.</p>
+
+  <h3>The raw stuff</h3>
+  <table>
+    <tr><td><code>api.vm</code></td><td>The Scratch VM (runtime, targets, everything).</td></tr>
+    <tr><td><code>api.blocks</code> / <code>api.workspace</code></td><td>ScratchBlocks (Blockly) and the code area, once the Code tab has loaded.</td></tr>
+    <tr><td><code>api.redux</code></td><td>The editor's Redux store.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Custom blocks (extensions)</h2>
+  <p>fromturbo runs standard custom extensions, so everything in the extension gallery works. Add one from <b>Mods → Add a custom extension</b>, or from the normal extension library.</p>
+  <p>Mods can add blocks without a separate file:</p>
+<pre><code>fromturbo.mods.register({
+    id: 'my-blocks',
+    name: 'My Blocks',
+    run (api) {
+        api.extensions.define(class {
+            constructor (Scratch) { this.Scratch = Scratch; }
+            getInfo () {
+                return {
+                    id: 'myblocks',
+                    name: 'My Blocks',
+                    blocks: [{
+                        opcode: 'double',
+                        blockType: this.Scratch.BlockType.REPORTER,
+                        text: 'double [N]',
+                        arguments: {N: {type: this.Scratch.ArgumentType.NUMBER, defaultValue: 4}}
+                    }]
+                };
+            }
+            double ({N}) { return Number(N) * 2; }
+        });
+    }
+});</code></pre>
+  <p class="muted">Blocks from <code>define()</code> only exist while the mod is installed. For blocks that should travel with the project, publish an extension file and load it with <code>api.extensions.load(url)</code>.</p>
+  <p><a class="btn" href="example-extension.js">See the example extension</a></p>
+</section>
+
+<section>
+  <h2>Share it with everyone</h2>
+  <p>In the fromturbo DMG app, open <b>Mods</b> and press <b>🍌 Upload a mod</b>, then pick your <code>.js</code> file. That's it: it shows up under <b>Community mods</b> for everyone, on the website and in the app, with an <b>Install</b> button.</p>
+  <p>Get the DMG app with <a href="https://www.npmjs.com/package/@blockblock2/bananapeel">BananaPeel</a> (the version from <code>bananapeel install</code> doesn't have Upload):</p>
+<pre><code>bananapeel dmg blockblock2/fromturbo@mac</code></pre>
+  <p>The first time, it asks you to sign in with Scratch (Scratch Auth). Your mod is credited to your Scratch username, never a real name.</p>
+  <p class="muted">The name and description come from your <code>fromturbo.mods.register({...})</code> call. Mods can be up to 200 KB. Community mods aren't checked by anyone, so install the ones you trust.</p>
+</section>
+
+<section>
+  <h2>Turning off cleanly</h2>
+  <p>If <code>run()</code> returns a function, fromturbo calls it when someone switches your mod off, so they don't need to reload. Remove your buttons and listeners in it.</p>
+</section>
+
+<section>
+  <h2>Built-in mods</h2>
+  <p><b>Scratchity</b> writes scripts for the selected sprite from a description. <b>Scratch Colab</b> lets a team edit one project live through a Firebase Realtime Database. <b>Scratchpack</b> opens and saves <code>.scratchpack</code> / <code>.scratchplay</code> archives. All free, all switchable in <b>Mods</b>.</p>
+</section>
+
+<section>
+  <h2>License</h2>
+  <p class="muted">fromturbo is a fork of TurboWarp and is licensed under the GNU GPL v3. It is not affiliated with Scratch, the Scratch Team, the Scratch Foundation or TurboWarp.</p>
+</section>
+
+</main>
+</body>
+</html>

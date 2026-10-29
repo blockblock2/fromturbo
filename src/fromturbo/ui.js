@@ -10,6 +10,10 @@ const CSS = `
 }
 .ft-menu-btn:hover { background: hsla(0, 0%, 0%, 0.15); }
 .ft-menu-btn .ft-dot { width: 8px; height: 8px; border-radius: 50%; background: #ffd75e; }
+@media only screen and (max-width: 1440px) {
+    .ft-menu-btn { padding: 0 0.45rem; gap: 4px; }
+    .ft-menu-btn .ft-dot { width: 6px; height: 6px; }
+}
 
 .ft-panel {
     position: fixed; z-index: 10000; top: 64px; right: 16px;

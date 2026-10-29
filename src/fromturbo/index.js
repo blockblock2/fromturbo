@@ -6,9 +6,10 @@ import scratchity from './mods/scratchity';
 import colab from './mods/colab';
 import scratchpack from './mods/scratchpack';
 import {rebrandBuiltinBlocks} from './brand';
+import {communitySection} from './community';
 
 const BUILT_IN = [scratchity, colab, scratchpack];
-const DOCS_URL = 'mods/';
+const DOCS_URL = location.protocol === 'file:' ? 'https://fromturbo.pages.dev/mods/' : 'mods/';
 
 // Mods loaded with ?mod=URL. Running someone's mod gives it full control of the editor,
 // so links from other sites always ask first.
@@ -90,6 +91,7 @@ const openManager = () => api.ui.openPanel({
 
         body.append(
             list,
+            communitySection(api),
             h('div', {className: 'ft-muted'}, 'Install a mod from a URL'),
             h('div', {className: 'ft-row', style: {flexWrap: 'nowrap'}}, urlInput, install),
             h('div', {className: 'ft-muted'}, 'Add a custom extension to this project'),

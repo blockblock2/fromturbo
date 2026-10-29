@@ -1,7 +1,8 @@
 // Scratchity — describe what you want, get real Scratch blocks in the selected sprite.
 // Talks to /api/scratchity (a Cloudflare Pages Function running Qwen2.5-Coder on Workers AI).
 
-const ENDPOINT = '/api/scratchity';
+// The Mac app opens from a file and has no server of its own, so it uses the website's.
+const ENDPOINT = location.protocol === 'file:' ? 'https://fromturbo.pages.dev/api/scratchity' : '/api/scratchity';
 
 const downloadBlob = (blob, filename) => {
     const url = URL.createObjectURL(blob);

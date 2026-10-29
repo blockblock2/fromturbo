@@ -134,6 +134,15 @@
 </section>
 
 <section>
+  <h2>Share it with everyone</h2>
+  <p>In the fromturbo DMG app, open <b>Mods</b> and press <b>🍌 Upload a mod</b>, then pick your <code>.js</code> file. That's it: it shows up under <b>Community mods</b> for everyone, on the website and in the app, with an <b>Install</b> button.</p>
+  <p>Get the DMG app with <a href="https://www.npmjs.com/package/@blockblock2/bananapeel">BananaPeel</a> (the version from <code>bananapeel install</code> doesn't have Upload):</p>
+<pre><code>bananapeel dmg blockblock2/fromturbo@mac</code></pre>
+  <p>The first time, it asks you to sign in with Scratch (Scratch Auth). Your mod is credited to your Scratch username, never a real name.</p>
+  <p class="muted">The name and description come from your <code>fromturbo.mods.register({...})</code> call. Mods can be up to 200 KB. Community mods aren't checked by anyone, so install the ones you trust.</p>
+</section>
+
+<section>
   <h2>Turning off cleanly</h2>
   <p>If <code>run()</code> returns a function, fromturbo calls it when someone switches your mod off, so they don't need to reload. Remove your buttons and listeners in it.</p>
 </section>

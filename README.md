@@ -5,6 +5,7 @@ A fast Scratch editor with built-in mods and a mod API:
 - **Scratchity**: describe what you want and it writes the blocks into the selected sprite (Qwen2.5-Coder on Workers AI)
 - **Scratch Colab**: edit one project together live through Firebase Realtime Database
 - **Scratchpack**: open and save `.scratchpack` / `.scratchplay` archives
+- **Community mods**: browse and install mods other people uploaded; upload from the Mac DMG app
 - **Mod API**: anyone can write a mod (`window.fromturbo`) and install it by URL; standard custom extensions work too
 
 Guide for modders: https://fromturbo.pages.dev/mods/
@@ -20,6 +21,32 @@ wrangler pages deploy
 `wrangler.toml` already names the project `fromturbo`, points at `./build`, and binds Workers AI as `AI` for Scratchity. The first deploy will offer to create the `fromturbo` Pages project.
 
 The editor is at `/editor.html`; `/` is the player/home page.
+
+## Community mods setup
+
+Everyone can browse and install community mods from **Mods**. Uploading (🍌 Upload a mod) only appears in the Mac DMG app, and needs a Scratch Auth sign-in; mods are credited to the uploader's Scratch username only.
+
+One-time setup:
+
+1. Create a **public** GitHub repo `blockblock2/fromturbo-mods` (tick "Add a README" so it has a `main` branch).
+2. Make a fine-grained GitHub token with **Contents: Read and write** on that repo only.
+3. From this folder:
+   ```bash
+   wrangler pages secret put GH_TOKEN --project-name fromturbo
+   wrangler pages secret put SESSION_SECRET --project-name fromturbo
+   ```
+   For `SESSION_SECRET`, paste any long random string.
+
+`wrangler.toml` already binds the `fromturbo-auth` KV namespace, which holds sign-ins for a few minutes.
+
+## Mac app (BananaPeel)
+
+The `mac` branch is the built editor packaged for BananaPeel:
+
+```bash
+bananapeel dmg blockblock2/fromturbo@mac       # DMG version (has Upload)
+bananapeel install blockblock2/fromturbo@mac   # installed version (no Upload)
+```
 
 ## Scratch Colab setup
 

@@ -6,7 +6,6 @@ fromturbo.mods.register({
     id: 'example-sprite-counter',
     name: 'Sprite Counter',
     description: 'Adds a menu button that tells you how many sprites and blocks your project has.',
-    author: 'you',
 
     run (api, {storage}) {
         const count = () => {

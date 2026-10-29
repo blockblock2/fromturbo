@@ -148,7 +148,7 @@ const Footer = () => (
                         />
                     </a>
                     {/* fromturbo: guide for modders */}
-                    <a href="mods/">{'Make a mod'}</a>
+                    <a href="mods/index.html">{'Make a mod'}</a>
                 </div>
                 <div className={styles.footerSection}>
                     <a href="https://github.com/blockblock2/fromturbo/issues">

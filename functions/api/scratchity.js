@@ -23,10 +23,21 @@ Rules:
 - Only refer to costumes and sounds that exist in the sprite.
 - Keep scripts simple and correct.`;
 
+// The Mac app (BananaPeel) runs from a file, so it calls this from a different origin.
+const CORS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+};
+
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
     status,
-    headers: {'content-type': 'application/json', 'cache-control': 'no-store'}
+    headers: {'content-type': 'application/json', 'cache-control': 'no-store', ...CORS}
 });
+
+export function onRequestOptions () {
+    return new Response(null, {status: 204, headers: CORS});
+}
 
 const extractXML = text => {
     const cleaned = String(text || '').replace(/```(?:xml)?/g, '');

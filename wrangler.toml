@@ -5,3 +5,13 @@ compatibility_date = "2026-10-28"
 # Scratchity uses Qwen2.5-Coder through Workers AI
 [ai]
 binding = "AI"
+
+# Scratch Auth sign-ins wait here for a few minutes while the app picks them up
+[[kv_namespaces]]
+binding = "AUTH_KV"
+id = "6c37ef7548d54ccc9c87c9e515e17fc3"
+
+# Community mods are stored in this public GitHub repo.
+# Secrets (set once, see README): GH_TOKEN, SESSION_SECRET
+[vars]
+MODS_REPO = "blockblock2/fromturbo-mods"

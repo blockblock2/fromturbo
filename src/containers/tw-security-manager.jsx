@@ -6,6 +6,7 @@ import bindAll from 'lodash.bindall';
 import SecurityManagerModal from '../components/tw-security-manager-modal/security-manager-modal.jsx';
 import SecurityModals from '../lib/tw-security-manager-constants';
 import {getPersistedUnsandboxed, setPersistedUnsandboxed} from '../lib/tw-persisted-unsandboxed.js';
+import {autoRunExtensions} from '../fromturbo/embed-host';
 
 /* eslint-disable require-atomic-updates */
 
@@ -269,6 +270,11 @@ class TWSecurityManagerComponent extends React.Component {
      * @returns {string} The VM worker mode to use
      */
     getSandboxMode (url) {
+        // fromturbo: embeds on the embed address run every extension the project needs, as-is.
+        if (autoRunExtensions()) {
+            log.info(`Embed: loading extension ${url} unsandboxed`);
+            return 'unsandboxed';
+        }
         if (isTrustedExtension(url)) {
             log.info(`Loading extension ${url} unsandboxed`);
             return 'unsandboxed';
@@ -291,6 +297,10 @@ class TWSecurityManagerComponent extends React.Component {
      * @returns {Promise<boolean>} Whether the extension can be loaded
      */
     async canLoadExtensionFromProject (url) {
+        if (autoRunExtensions()) {
+            log.info(`Embed: loading extension ${url} automatically`);
+            return true;
+        }
         if (isTrustedExtension(url)) {
             log.info(`Loading extension ${url} automatically`);
             return true;
@@ -324,6 +334,10 @@ class TWSecurityManagerComponent extends React.Component {
         const parsed = parseURL(url, FETCHABLE_PROTOCOLS);
         if (!parsed) {
             return false;
+        }
+        // fromturbo: in embeds, extensions can reach the internet without asking.
+        if (autoRunExtensions()) {
+            return true;
         }
         if (isAlwaysTrustedForFetching(parsed)) {
             // For untrusted paths, don't even show a dialog, just auto-reject because users won't understand

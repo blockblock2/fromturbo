@@ -8,8 +8,10 @@ import scratchpack from './mods/scratchpack';
 import {rebrandBuiltinBlocks} from './brand';
 import {SECTIONS} from './sections';
 import {communitySection} from './community';
+import {leaveEmbedHost} from './embed-host';
+import embed from './mods/embed';
 
-const BUILT_IN = [scratchity, colab, scratchpack];
+const BUILT_IN = [scratchity, colab, scratchpack, embed];
 const DOCS_URL = location.protocol === 'file:' ? 'https://fromturbo.pages.dev/mods/' : 'mods/';
 
 // Mods loaded with ?mod=URL. Running someone's mod gives it full control of the editor,
@@ -105,6 +107,7 @@ const openManager = () => api.ui.openPanel({
 });
 
 const boot = async () => {
+    if (leaveEmbedHost()) return;
     window.fromturbo = api;
     for (const mod of BUILT_IN) api.mods.register(mod);
 

@@ -23,7 +23,8 @@ const COMMUNITY = {from: '#59c08c', to: '#2f8f63'};
 export const BUILTIN_MOD_TILES = {
     'scratchity': tile({...BLUE, glyph: '✨', label: 'Scratchity'}),
     'colab': tile({...BLUE, glyph: '👥', label: 'Scratch Colab'}),
-    'scratchpack': tile({...BLUE, glyph: '📦', label: '.scratchpack'})
+    'scratchpack': tile({...BLUE, glyph: '📦', label: '.scratchpack'}),
+    'embed': tile({...BLUE, glyph: '🖼️', label: 'Embed'})
 };
 
 /** Picture for a community item, coloured by whether it's approved. */

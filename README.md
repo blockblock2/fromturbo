@@ -20,18 +20,19 @@ Website: **https://fromturbo.pages.dev** · Editor: **https://fromturbo.pages.de
 3. [Scratchity](#3-scratchity)
 4. [Scratch Colab](#4-scratch-colab)
 5. [.scratchpack](#5-scratchpack)
-6. [The Mods panel](#6-the-mods-panel)
-7. [The extension library and its sections](#7-the-extension-library-and-its-sections)
-8. [Publishing mods and extensions](#8-publishing-mods-and-extensions)
-9. [Approving (admins)](#9-approving-admins)
-10. [Making a mod](#10-making-a-mod)
-11. [Making an extension](#11-making-an-extension)
-12. [Mod API reference](#12-mod-api-reference)
-13. [The Mac app](#13-the-mac-app)
-14. [Running the website](#14-running-the-website)
-15. [How it's put together](#15-how-its-put-together)
-16. [Privacy and safety](#16-privacy-and-safety)
-17. [License](#license)
+6. [Embedding a project](#6-embedding-a-project)
+7. [The Mods panel](#7-the-mods-panel)
+8. [The extension library and its sections](#8-the-extension-library-and-its-sections)
+9. [Publishing mods and extensions](#9-publishing-mods-and-extensions)
+10. [Approving (admins)](#10-approving-admins)
+11. [Making a mod](#11-making-a-mod)
+12. [Making an extension](#12-making-an-extension)
+13. [Mod API reference](#13-mod-api-reference)
+14. [The Mac app](#14-the-mac-app)
+15. [Running the website](#15-running-the-website)
+16. [How it's put together](#16-how-its-put-together)
+17. [Privacy and safety](#17-privacy-and-safety)
+18. [License](#license)
 
 ---
 
@@ -126,7 +127,26 @@ Packs without a `manifest.json` still work: fromturbo finds the `.sb3` files ins
 
 ---
 
-## 6. The Mods panel
+## 6. Embedding a project
+
+**What it does:** puts your project on any other website (a blog, a school site, your own page) as a playable box. If the project uses **custom extensions**, they run by themselves in the embed. Nobody has to click "Allow".
+
+**How to use it:**
+
+1. Open the project and click **Embed** in the menu bar.
+2. Pick the **Width** and **Height** (482 × 412 fits the player exactly) and tick **Start automatically** if it should start without pressing the green flag.
+3. Click **Create embed code**. fromturbo saves a copy of the project online and shows the code.
+4. Click **Copy code** and paste it into the other web page. **Open the embed →** shows what it will look like.
+
+Changing the size or the tick box updates the code without saving again. The embed is a copy of the project **as it was when you clicked the button**: after changing the project, click **Make a new embed** and replace the code.
+
+**Why custom extensions can run by themselves:** embeds play on their own address, `embed.fromturbo.pages.dev`. Browsers keep each address's data apart, so an extension running there can't reach anyone's fromturbo editor, mods, settings or sign-in. Only the embed page runs there; anything else on that address sends you to `fromturbo.pages.dev`. On the main address, extensions still ask first, as usual.
+
+**Limits:** projects up to 8 MB, and 20 embeds per person per day. Saved copies are public files in the `fromturbo-mods` repo (folder `projects/`), so anyone with the link can download them.
+
+---
+
+## 7. The Mods panel
 
 Click **Mods**. From top to bottom:
 
@@ -135,7 +155,7 @@ Click **Mods**. From top to bottom:
 **Community.** Mods and extensions other people published. Each one shows a small note saying which section it's in, its description, and who published it (their Scratch username).
 - **Install** (mods): installs it; it loads every time you open fromturbo.
 - **Add** (extensions): adds its blocks to the project you have open.
-- In the DMG app: **🍌 Upload a mod** and **🧩 Publish an extension** (see [section 8](#8-publishing-mods-and-extensions)).
+- In the DMG app: **🍌 Upload a mod** and **🧩 Publish an extension** (see [section 9](#9-publishing-mods-and-extensions)).
 
 **Install a mod from a URL.** Paste a link to a mod's `.js` file and press **Install**.
 
@@ -147,7 +167,7 @@ Click **Mods**. From top to bottom:
 
 ---
 
-## 7. The extension library and its sections
+## 8. The extension library and its sections
 
 Click the **Add Extension** button (bottom-left of the editor). Along the top is a filter button for each section, and **every card has a small note** above its name saying which section it's in.
 
@@ -168,9 +188,9 @@ Clicking a card:
 
 ---
 
-## 8. Publishing mods and extensions
+## 9. Publishing mods and extensions
 
-Publishing only works in the **DMG version of the Mac app** (see [section 13](#13-the-mac-app)).
+Publishing only works in the **DMG version of the Mac app** (see [section 14](#14-the-mac-app)).
 
 1. Open **Mods**.
 2. Press **🍌 Upload a mod** or **🧩 Publish an extension**.
@@ -190,7 +210,7 @@ The panel shows **Publishing as @yourname** with a **Sign out** link.
 
 ---
 
-## 9. Approving (admins)
+## 10. Approving (admins)
 
 Admins are the Scratch usernames in `ADMINS` in `wrangler.toml` (by default **blockblock2**).
 
@@ -203,7 +223,7 @@ To add another admin, add their Scratch username to `ADMINS` (comma-separated) a
 
 ---
 
-## 10. Making a mod
+## 11. Making a mod
 
 A **mod** changes the editor: buttons, panels, tools. It's one `.js` file:
 
@@ -222,7 +242,7 @@ fromturbo.mods.register({
 
 **Try it:** open the editor, press **⌘⌥J** (Chrome) or **⌘⌥C** (Safari) for the console, paste the code, press Enter. A **Hello** button appears.
 
-**Share it:** publish it (section 8), host the file anywhere and share the `?mod=` link, or have people paste its link into **Install a mod from a URL**.
+**Share it:** publish it (section 9), host the file anywhere and share the `?mod=` link, or have people paste its link into **Install a mod from a URL**.
 
 A bigger example is at https://fromturbo.pages.dev/mods/example-mod.js.
 
@@ -236,7 +256,7 @@ A bigger example is at https://fromturbo.pages.dev/mods/example-mod.js.
 
 ---
 
-## 11. Making an extension
+## 12. Making an extension
 
 An **extension** adds new blocks. It's the standard Scratch/TurboWarp custom extension format, so it works in TurboWarp too:
 
@@ -294,7 +314,7 @@ A bigger example is at https://fromturbo.pages.dev/mods/example-extension.js.
 
 ---
 
-## 12. Mod API reference
+## 13. Mod API reference
 
 Your mod's `run (api, {storage})` gets everything below. It's also on `window.fromturbo`.
 
@@ -374,7 +394,7 @@ Returning a function from `run()` still works. Blocks from `api.extensions.defin
 
 ---
 
-## 13. The Mac app
+## 14. The Mac app
 
 fromturbo runs as a real Mac app through [BananaPeel](https://www.npmjs.com/package/@blockblock2/bananapeel). The app is the `main` branch of **blockblock2/fromturbo-app**.
 
@@ -397,7 +417,7 @@ In the Mac app:
 
 ---
 
-## 14. Running the website
+## 15. Running the website
 
 The site is Cloudflare Pages (static files) plus Pages Functions (`functions/`). Everything is configured in `wrangler.toml`.
 
@@ -407,7 +427,10 @@ From a folder with `build/`, `functions/` and `wrangler.toml`:
 
 ```bash
 wrangler pages deploy
+wrangler pages deploy --branch embed   # the embed address, embed.fromturbo.pages.dev
 ```
+
+Deploy both every time, so embeds get the same version as the editor.
 
 ### One-time setup
 
@@ -429,20 +452,22 @@ NODE_ENV=production npm run build      # output goes to build/
 
 ---
 
-## 15. How it's put together
+## 16. How it's put together
 
 | Part | Where |
 | --- | --- |
 | Mod API and boot | `src/fromturbo/api.js`, `src/fromturbo/index.js` |
 | Panels, buttons, toasts | `src/fromturbo/ui.js` |
-| Built-in mods | `src/fromturbo/mods/` (scratchity, colab, scratchpack) |
+| Built-in mods | `src/fromturbo/mods/` (scratchity, colab, scratchpack, embed) |
 | Community items, publishing, sign-in | `src/fromturbo/community.js` |
 | Sections and card notes | `src/fromturbo/sections.js`, `src/containers/extension-library.jsx` |
+| Embed address rules (auto-run extensions) | `src/fromturbo/embed-host.js`, `src/containers/tw-security-manager.jsx` |
 | Logo, card pictures, block rebrand | `src/fromturbo/brand/` |
 | Modding guide and examples | `static/mods/` |
 | Scratchity backend | `functions/api/scratchity.js` |
 | Scratch Auth sign-in | `functions/api/auth/[[path]].js`, `functions/api/_auth.js` |
 | Community list, publishing, approving | `functions/api/mods/` |
+| Saved projects for embeds | `functions/api/projects/` |
 
 **Website API** (used by the editor):
 
@@ -453,13 +478,16 @@ NODE_ENV=production npm run build      # output goes to build/
 | `GET /api/mods/<id>.js` | One item's code |
 | `POST /api/mods` | Publish (signed in) |
 | `POST /api/mods/approve` | Approve or unapprove (admins) |
+| `POST /api/projects?name=` | Save a project for embedding (body: the .sb3 as base64 text) → `{id, url}` |
+| `GET /api/projects/<id>.sb3` | A saved project (any site may load it) |
 | `/api/auth/start`, `/callback`, `/poll`, `/me` | Scratch Auth sign-in |
 
 ---
 
-## 16. Privacy and safety
+## 17. Privacy and safety
 
 - **Mods and extensions can do anything** in the editor and to your project. Community items aren't checked by anyone until approved, so only install ones you trust.
+- **Embeds run the project's custom extensions automatically**, on the separate address `embed.fromturbo.pages.dev`, where they can't reach your editor's data. Only embed projects you'd be happy for anyone to download.
 - Publishing stores only your **Scratch username**, never a real name.
 - Scratchity sends your description and the selected sprite's variable, costume and sound names to fromturbo's server and Cloudflare Workers AI. Nothing else from the project.
 - Colab sends the whole project to the Firebase database you enter.

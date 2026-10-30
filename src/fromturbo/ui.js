@@ -39,6 +39,9 @@ const CSS = `
     background: var(--ui-primary, #fff); color: inherit; font: inherit;
 }
 .ft-panel textarea { min-height: 90px; resize: vertical; }
+.ft-panel input[type=number] { width: 80px; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--ui-black-transparent, rgba(0,0,0,.2));
+    background: var(--ui-primary, #fff); color: inherit; font: inherit; }
+.ft-panel textarea[readonly] { font: 12px/1.4 ui-monospace, Menlo, monospace; }
 .ft-btn {
     padding: 8px 14px; border-radius: 6px; border: 0; cursor: pointer; font: inherit; font-weight: bold;
     background: var(--looks-secondary, #855cd6); color: #fff;

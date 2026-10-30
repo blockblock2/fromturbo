@@ -214,7 +214,7 @@ fromturbo.mods.register({
     description: 'Adds a button that says hi.',
     run (api, {storage}) {
         const remove = api.ui.addMenuButton('Hello', () => api.ui.toast('Hi! 👋'));
-        // Return a function to clean up, so the mod can be switched off without a reload.
+        // Switching the mod off removes this button by itself, no reload needed.
         return remove;
     }
 });
@@ -359,6 +359,18 @@ Mods can send their own events with `api.emit(name, ...args)`, so mods can talk 
 | `api.blocks` / `api.workspace` | ScratchBlocks and the code area (after the Code tab has loaded) |
 | `api.redux` | The editor's Redux store |
 | `api.waitFor(check, timeout?)` | Waits until `check()` returns something truthy |
+
+### Turning off without a reload
+
+When a mod is switched off or removed, fromturbo undoes everything it added through `api` straight away: menu buttons, panels, `api.on` listeners, plus these helpers:
+
+| Call | What it does |
+| --- | --- |
+| `api.every(ms, fn)` / `api.after(ms, fn)` | Like `setInterval` / `setTimeout`, stopped automatically |
+| `api.addStyle(css)` | Adds CSS to the page, removed automatically |
+| `api.onCleanup(fn)` | Runs `fn` on switch-off, for anything done outside `api` |
+
+Returning a function from `run()` still works. Blocks from `api.extensions.define()` stay until the page reloads.
 
 ---
 

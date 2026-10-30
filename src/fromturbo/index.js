@@ -34,17 +34,15 @@ const openManager = () => api.ui.openPanel({
             list.replaceChildren(...api.mods.list().map(m => {
                 const toggle = h('input', {'type': 'checkbox', 'checked': m.enabled, 'aria-label': `Turn ${m.name} on or off`});
                 toggle.addEventListener('change', () => {
-                    const result = api.mods.setEnabled(m.id, toggle.checked);
-                    status.textContent = result === 'reload' ?
-                        `${m.name} turns off after you reload the page.` :
-                        `${m.name} ${toggle.checked ? 'on' : 'off'}`;
+                    api.mods.setEnabled(m.id, toggle.checked);
+                    status.textContent = `${m.name} ${toggle.checked ? 'on' : 'off'}`;
                     draw();
                 });
                 const remove = m.builtIn ? null : h('button', {
                     className: 'ft-btn ft-quiet',
                     onclick: () => {
                         api.mods.removeURL(m.source);
-                        status.textContent = `Removed ${m.name}. Reload to finish.`;
+                        status.textContent = `Removed ${m.name}.`;
                         draw();
                     }
                 }, 'Remove');

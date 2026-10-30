@@ -150,9 +150,13 @@ const addMenuButton = (label, onClick, {title} = {}) => {
         const wait = setInterval(() => flushButtons() && clearInterval(wait), 200);
     }
     if (observer && allButtons.length === 1) observer.observe(document.body, {childList: true, subtree: true});
+    // Safe to call more than once.
     return () => {
         btn.remove();
-        allButtons.splice(allButtons.indexOf(btn), 1);
+        for (const list of [allButtons, pendingButtons]) {
+            const i = list.indexOf(btn);
+            if (i !== -1) list.splice(i, 1);
+        }
     };
 };
 
@@ -173,13 +177,30 @@ const openPanel = ({id, title, render, width}) => {
     const head = h('div', {className: 'ft-panel-head'}, h('span', {}, title || 'Mod'), closeBtn);
     const el = h('div', {'className': 'ft-panel', 'role': 'dialog', 'aria-label': title || 'Mod'}, head, body);
     if (width) el.style.width = `min(${width}px, calc(100vw - 32px))`;
+    // Cascade panels so a new one doesn't hide the ones already open.
+    const already = document.querySelectorAll('.ft-panel').length;
+    if (already) {
+        el.style.top = `${64 + (already * 28)}px`;
+        el.style.right = `${16 + (already * 28)}px`;
+    }
+    let closed = false;
+    let renderCleanup = null;
     const panel = {
         el,
         body,
+        // Safe to call more than once.
         close () {
+            if (closed) return;
+            closed = true;
             el.remove();
             if (id) openPanels.delete(id);
-            if (panel.onClose) panel.onClose();
+            for (const fn of [renderCleanup, panel.onClose]) {
+                try {
+                    if (typeof fn === 'function') fn();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
         },
         onClose: null
     };
@@ -204,7 +225,8 @@ const openPanel = ({id, title, render, width}) => {
     });
     document.body.appendChild(el);
     if (id) openPanels.set(id, panel);
-    render(body, panel);
+    // If render() returns a function, it runs when the panel closes.
+    renderCleanup = render(body, panel);
     return panel;
 };
 

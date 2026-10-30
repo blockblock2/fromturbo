@@ -411,8 +411,22 @@ jump (args, util) {
 </section>
 
 <section>
-  <h2>Turning off cleanly</h2>
-  <p>If <code>run()</code> returns a function, fromturbo calls it when someone switches your mod off, so they don't need to reload. Remove your buttons and listeners in it.</p>
+  <h2>Turning off without a reload</h2>
+  <p>When someone switches your mod off (or removes it), fromturbo undoes <b>everything your mod added through <code>api</code></b> straight away: menu buttons, panels, <code>api.on</code> listeners, and the helpers below. No reload, and no clean-up code needed.</p>
+  <table>
+    <tr><td><code>api.every(ms, fn)</code></td><td>Like <code>setInterval</code>, stopped automatically.</td></tr>
+    <tr><td><code>api.after(ms, fn)</code></td><td>Like <code>setTimeout</code>, cancelled automatically.</td></tr>
+    <tr><td><code>api.addStyle(css)</code></td><td>Adds CSS to the page, removed automatically.</td></tr>
+    <tr><td><code>api.onCleanup(fn)</code></td><td>Runs <code>fn</code> when the mod is switched off. Use it for anything you did <i>outside</i> <code>api</code> (your own <code>setInterval</code>, <code>addEventListener</code>, elements you added to the page).</td></tr>
+  </table>
+<pre><code>run (api) {
+    api.ui.addMenuButton('Time', () => api.ui.toast(new Date().toLocaleTimeString()));  // removed for you
+    api.every(60000, () => console.log('another minute'));                               // stopped for you
+    const onKey = e => console.log(e.key);
+    window.addEventListener('keydown', onKey);
+    api.onCleanup(() => window.removeEventListener('keydown', onKey));                     // yours to undo
+}</code></pre>
+  <p class="muted">Returning a function from <code>run()</code> still works too: it runs along with everything else. Blocks added with <code>api.extensions.define()</code> stay in the palette until the page is reloaded.</p>
 </section>
 
 <section>

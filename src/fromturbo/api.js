@@ -215,17 +215,80 @@ const storageFor = id => ({
     }
 });
 
+/**
+ * The api a mod gets. It's the normal api, except that everything the mod adds
+ * through it (menu buttons, panels, event listeners, timers, styles) is remembered,
+ * so switching the mod off removes all of it with no reload.
+ */
+const modApi = entry => {
+    const track = fn => {
+        entry.disposers.push(fn);
+        return fn;
+    };
+    const scoped = Object.create(api);
+    scoped.on = (event, fn) => track(on(event, fn));
+    scoped.ui = Object.assign({}, api.ui, {
+        addMenuButton: (...args) => track(addMenuButton(...args)),
+        openPanel: options => {
+            const panel = openPanel(options);
+            track(() => panel.close());
+            return panel;
+        }
+    });
+    /** Run fn when the mod is switched off (for things done outside the api). */
+    scoped.onCleanup = fn => {
+        if (typeof fn === 'function') track(fn);
+    };
+    /** Like setInterval / setTimeout, but stopped when the mod is switched off. */
+    scoped.every = (ms, fn) => {
+        const t = setInterval(fn, ms);
+        track(() => clearInterval(t));
+        return t;
+    };
+    scoped.after = (ms, fn) => {
+        const t = setTimeout(fn, ms);
+        track(() => clearTimeout(t));
+        return t;
+    };
+    /** Add CSS to the page; removed when the mod is switched off. */
+    scoped.addStyle = css => {
+        const style = document.createElement('style');
+        style.dataset.fromturboMod = entry.def.id;
+        style.textContent = css;
+        document.head.appendChild(style);
+        track(() => style.remove());
+        return style;
+    };
+    return scoped;
+};
+
 const runMod = entry => {
     if (entry.running) return;
+    entry.disposers = [];
     try {
-        const result = entry.def.run(api, {storage: storageFor(entry.def.id)});
-        entry.cleanup = typeof result === 'function' ? result : null;
+        const result = entry.def.run(modApi(entry), {storage: storageFor(entry.def.id)});
+        if (typeof result === 'function') entry.disposers.push(result);
         entry.running = true;
         emit('modStarted', entry.def.id);
     } catch (e) {
         console.error(`[fromturbo] mod "${entry.def.id}" crashed`, e);
+        stopMod(entry); // undo whatever it managed to add before crashing
         toast(`Mod "${entry.def.name || entry.def.id}" crashed — see console`);
     }
+};
+
+/** Undo everything the mod added, newest first. */
+const stopMod = entry => {
+    const disposers = (entry.disposers || []).splice(0).reverse();
+    for (const fn of disposers) {
+        try {
+            fn();
+        } catch (e) {
+            console.error(`[fromturbo] cleaning up mod "${entry.def.id}"`, e);
+        }
+    }
+    entry.running = false;
+    emit('modStopped', entry.def.id);
 };
 
 const mods = {
@@ -262,16 +325,8 @@ const mods = {
             runMod(entry);
             return 'started';
         }
-        if (entry.running && entry.cleanup) {
-            try {
-                entry.cleanup();
-            } catch (e) {
-                console.error(e);
-            }
-            entry.running = false;
-            return 'stopped';
-        }
-        return entry.running ? 'reload' : 'stopped';
+        if (entry.running) stopMod(entry);
+        return 'stopped';
     },
     /** URLs of mods the user installed. */
     urls () {
@@ -297,10 +352,18 @@ const mods = {
             mods._currentSource = null;
         });
     },
+    /** Uninstall a mod that was installed from a URL: switch it off and forget it. */
     removeURL (url) {
         safeSet(MOD_URLS_KEY, mods.urls().filter(u => u !== url));
-        for (const [id, e] of registry) {
-            if (e.source === url) mods.setEnabled(id, false);
+        for (const [id, e] of [...registry]) {
+            if (e.source !== url) continue;
+            if (e.running) stopMod(e);
+            registry.delete(id);
+            // Forget its on/off switch too, so installing it again starts it.
+            const state = safeGet(MOD_STATE_KEY, {});
+            delete state[id];
+            safeSet(MOD_STATE_KEY, state);
+            emit('modRegistered', id); // lets open lists redraw
         }
     },
     _currentSource: null

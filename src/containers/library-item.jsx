@@ -158,6 +158,7 @@ class LibraryItem extends React.PureComponent {
                 internetConnectionRequired={this.props.internetConnectionRequired}
                 isPlaying={this.props.isPlaying}
                 name={this.props.name}
+                note={this.props.note}
                 credits={this.props.credits}
                 docsURI={this.props.docsURI}
                 samples={this.props.samples}
@@ -178,6 +179,7 @@ class LibraryItem extends React.PureComponent {
 }
 
 LibraryItem.propTypes = {
+    note: PropTypes.string,
     intl: intlShape,
     bluetoothRequired: PropTypes.bool,
     collaborator: PropTypes.string,

@@ -90,6 +90,9 @@ class LibraryItemComponent extends React.PureComponent {
                         classNames(styles.featuredExtensionText, styles.featuredText) : styles.featuredText
                     }
                 >
+                    {this.props.note ? (
+                        <span className={styles.libraryItemNote}>{this.props.note}</span>
+                    ) : null}
                     <span className={styles.libraryItemName}>{this.props.name}</span>
                     <br />
                     <span className={styles.featuredDescription}>{this.props.description}</span>
@@ -272,6 +275,7 @@ LibraryItemComponent.propTypes = {
         PropTypes.string,
         PropTypes.node
     ]),
+    note: PropTypes.string,
     credits: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.node

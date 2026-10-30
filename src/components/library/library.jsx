@@ -333,6 +333,7 @@ class LibraryComponent extends React.Component {
                                         dataItem.rawURL
                                 )}
                                 name={dataItem.name}
+                                note={dataItem.note}
                                 credits={dataItem.credits}
                                 samples={dataItem.samples}
                                 docsURI={dataItem.docsURI}

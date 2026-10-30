@@ -11,6 +11,9 @@ import extensionLibraryContent, {
     galleryMore
 } from '../lib/libraries/extensions/index.jsx';
 import extensionTags from '../lib/libraries/tw-extension-tags';
+import {SECTIONS, sectionFor} from '../fromturbo/sections';
+import {fetchItems as fetchCommunity} from '../fromturbo/community';
+import {BUILTIN_MOD_TILES, MOD_FALLBACK_TILE, itemTile} from '../fromturbo/brand/tiles';
 
 import LibraryComponent from '../components/library/library.jsx';
 import extensionIcon from '../components/action-menu/icon--sprite.svg';
@@ -23,15 +26,57 @@ const messages = defineMessages({
     }
 });
 
+// fromturbo: which section each built-in card belongs to.
+const builtinSection = extension => {
+    if (extension.extensionId === 'tw') return SECTIONS.ftExtApproved; // fromturbo Blocks
+    if ((extension.tags || []).includes('scratch')) return SECTIONS.scratch;
+    return SECTIONS.turbowarp; // Custom Reporters, custom extensions, the extension gallery
+};
+
 const toLibraryItem = extension => {
     if (typeof extension === 'object') {
+        const section = extension.section || builtinSection(extension);
         return ({
             rawURL: extension.iconURL || extensionIcon,
-            ...extension
+            ...extension,
+            tags: [section.tag],
+            note: section.note
         });
     }
     return extension;
 };
+
+// fromturbo's own mods (Scratchity, Colab, .scratchpack) as cards.
+const builtinModItems = () => {
+    const ft = window.fromturbo;
+    if (!ft) return [];
+    return ft.mods.list().filter(m => m.builtIn)
+        .map(m => ({
+            name: m.name,
+            description: m.enabled ? `${m.description} (On)` : m.description,
+            extensionId: `ftmod-${m.id}`,
+            builtinModId: m.id,
+            iconURL: BUILTIN_MOD_TILES[m.id] || MOD_FALLBACK_TILE,
+            section: SECTIONS.ftModApproved,
+            featured: true
+        }));
+};
+
+// Published community mods and extensions as cards.
+const communityItems = items => items.map(item => ({
+    name: item.name,
+    description: item.description || ' ',
+    extensionId: item.kind === 'extension' ? (item.extId || `community-${item.id}`) : `ftmod-community-${item.id}`,
+    extensionURL: item.kind === 'extension' ? item.url : null,
+    modURL: item.kind === 'mod' ? item.url : null,
+    iconURL: itemTile(item),
+    credits: item.author ? [`@${item.author}`] : [],
+    section: sectionFor(item),
+    incompatibleWithScratch: true,
+    featured: true
+}));
+
+const inSection = section => item => item !== '---' && item.tags && item.tags[0] === section.tag;
 
 const translateGalleryItem = (extension, locale) => ({
     ...extension,
@@ -55,7 +100,7 @@ const fetchLibrary = async () => {
         extensionId: extension.id,
         extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
         iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
-        tags: ['tw'],
+        tags: ['turbowarp'],
         credits: [
             ...(extension.original || []),
             ...(extension.by || [])
@@ -93,10 +138,14 @@ class ExtensionLibrary extends React.PureComponent {
         this.state = {
             gallery: cachedGallery,
             galleryError: null,
-            galleryTimedOut: false
+            galleryTimedOut: false,
+            community: []
         };
     }
     componentDidMount () {
+        fetchCommunity()
+            .then(items => this.setState({community: items}))
+            .catch(error => log.warn('community items', error));
         if (!this.state.gallery) {
             const timeout = setTimeout(() => {
                 this.setState({
@@ -127,6 +176,25 @@ class ExtensionLibrary extends React.PureComponent {
         }
 
         const extensionId = item.extensionId;
+
+        // fromturbo mods are installed (or switched on) instead of added to the project.
+        if (item.builtinModId || item.modURL) {
+            const ft = window.fromturbo;
+            if (!ft) return;
+            const done = message => ft.ui.toast(message);
+            if (item.builtinModId) {
+                ft.mods.setEnabled(item.builtinModId, true);
+                done(`${item.name} is on. Find it in the menu bar.`);
+            } else if (ft.mods.urls().includes(item.modURL)) {
+                done(`${item.name} is already installed.`);
+            } else {
+                ft.mods.loadURL(item.modURL)
+                    .then(() => done(`Installed ${item.name}. Find it in the menu bar.`))
+                    .catch(err => done(err.message));
+            }
+            this.props.onRequestClose();
+            return;
+        }
 
         if (extensionId === 'custom_extension') {
             this.props.onOpenCustomExtensionModal();
@@ -159,7 +227,26 @@ class ExtensionLibrary extends React.PureComponent {
     render () {
         let library = null;
         if (this.state.gallery || this.state.galleryError || this.state.galleryTimedOut) {
-            library = extensionLibraryContent.map(toLibraryItem);
+            // fromturbo: grouped by section, with a line between each group.
+            const builtins = extensionLibraryContent.map(toLibraryItem);
+            const community = communityItems(this.state.community).map(toLibraryItem);
+            const mods = builtinModItems().map(toLibraryItem);
+            const groups = [
+                builtins.filter(inSection(SECTIONS.scratch)),
+                [
+                    ...builtins.filter(inSection(SECTIONS.ftExtApproved)),
+                    ...community.filter(inSection(SECTIONS.ftExtApproved))
+                ],
+                [...mods, ...community.filter(inSection(SECTIONS.ftModApproved))],
+                community.filter(inSection(SECTIONS.ftExtCommunity)),
+                community.filter(inSection(SECTIONS.ftModCommunity)),
+                builtins.filter(inSection(SECTIONS.turbowarp))
+            ].filter(g => g.length);
+            library = [];
+            for (const group of groups) {
+                if (library.length) library.push('---');
+                library.push(...group);
+            }
             library.push('---');
             if (this.state.gallery) {
                 library.push(toLibraryItem(galleryMore));

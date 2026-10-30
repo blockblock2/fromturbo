@@ -1,8 +1,11 @@
-// Community mods: everyone can browse and install them from Mods.
-// Uploading is exclusive to the BananaPeel DMG version of the Mac app
+// Community mods and extensions.
+// Everyone can browse and install them (Mods panel and the extension library).
+// Publishing is exclusive to the BananaPeel DMG version of the Mac app
 // (BananaPeel's window sets window.bananapeel.kind to "dmg" or "installed"),
-// and needs a Scratch Auth sign-in. Mods are credited to the uploader's
-// Scratch username only, never a real name.
+// and needs a Scratch Auth sign-in. Everything is credited to the uploader's
+// Scratch username only, never a real name. Admins can approve items.
+
+import {sectionFor} from './sections';
 
 const SITE = 'https://fromturbo.pages.dev';
 const ORIGIN = location.protocol === 'file:' ? SITE : location.origin;
@@ -11,7 +14,7 @@ const AUTH = `${ORIGIN}/api/auth`;
 const TOKEN_KEY = 'fromturbo.scratchAuth';
 
 const bananaPeelKind = () => (window.bananapeel && typeof window.bananapeel === 'object' ? window.bananapeel.kind : null);
-const canUpload = () => bananaPeelKind() === 'dmg';
+const canPublish = () => bananaPeelKind() === 'dmg';
 
 const store = {
     get () {
@@ -48,7 +51,7 @@ const randomNonce = () => {
 
 /**
  * Sign in with Scratch Auth. The sign-in page opens in the browser (BananaPeel sends
- * website links there); the app waits for it to finish. Resolves {username, token}.
+ * website links there); the app waits for it to finish. Resolves {username, token, admin}.
  */
 const signIn = onStatus => new Promise((resolve, reject) => {
     const nonce = randomNonce();
@@ -56,13 +59,13 @@ const signIn = onStatus => new Promise((resolve, reject) => {
     onStatus('Finish signing in with Scratch in your browser…');
     const started = Date.now();
     const tick = async () => {
-        if (Date.now() - started > 5 * 60 * 1000) return reject(new Error('Sign-in timed out. Press Upload to try again.'));
+        if (Date.now() - started > 5 * 60 * 1000) return reject(new Error('Sign-in timed out. Try again.'));
         try {
             const res = await fetch(`${AUTH}/poll?nonce=${nonce}`, {cache: 'no-store'});
             const data = await res.json().catch(() => ({}));
             if (!res.ok) return reject(new Error(data.error || `HTTP ${res.status}`));
             if (data.token && data.username) {
-                const session = {username: data.username, token: data.token};
+                const session = {username: data.username, token: data.token, admin: !!data.admin};
                 store.set(session);
                 return resolve(session);
             }
@@ -74,128 +77,170 @@ const signIn = onStatus => new Promise((resolve, reject) => {
     setTimeout(tick, 2000);
 });
 
-const fetchMods = async () => {
+/** Everything published: [{id, kind, approved, name, description, author, url, extId?}] */
+const fetchItems = async () => {
     const res = await fetch(API, {cache: 'no-store'});
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-    return data.mods || [];
+    return (data.items || data.mods || []).map(i => ({kind: 'mod', approved: false, ...i}));
 };
 
-const uploadMod = async (file, session) => {
-    const code = await file.text();
-    const res = await fetch(API, {
+const authedPost = async (url, session, body) => {
+    const res = await fetch(url, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${session.token}`},
-        body: JSON.stringify({code, filename: file.name})
+        body: JSON.stringify(body)
     });
     const data = await res.json().catch(() => ({}));
     if (res.status === 401) store.set(null);
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-    return data.mod;
+    return data;
 };
 
-/** The "Community mods" part of the Mods panel. */
+const publishFile = async (file, kind, session) =>
+    (await authedPost(API, session, {code: await file.text(), filename: file.name, kind})).item;
+
+const setApproved = async (id, approved, session) =>
+    (await authedPost(`${API}/approve`, session, {id, approved})).item;
+
+/** Install a community item: mods are installed for good, extensions are added to the open project. */
+const installItem = async (api, item) => {
+    if (item.kind === 'extension') {
+        await api.extensions.load(item.url);
+        return 'Added to this project';
+    }
+    await api.mods.loadURL(item.url);
+    return 'Installed';
+};
+
+/** The "Community" part of the Mods panel. */
 const communitySection = api => {
     const {h} = api.ui;
-    const list = h('div', {className: 'ft-list'}, h('div', {className: 'ft-muted'}, 'Loading community mods…'));
+    const list = h('div', {className: 'ft-list'}, h('div', {className: 'ft-muted'}, 'Loading…'));
     const status = h('div', {className: 'ft-muted'});
     const who = h('div', {className: 'ft-muted'});
     const say = text => {
         status.textContent = text;
     };
 
-    const draw = mods => {
-        if (!mods.length) {
-            list.replaceChildren(h('div', {className: 'ft-muted'}, 'No community mods yet.'));
+    const draw = items => {
+        if (!items.length) {
+            list.replaceChildren(h('div', {className: 'ft-muted'}, 'Nothing published yet.'));
             return;
         }
         const installed = new Set(api.mods.urls());
-        list.replaceChildren(...mods.slice(0, 50).map(m => {
-            const have = installed.has(m.url);
+        const session = store.get();
+        list.replaceChildren(...items.slice(0, 60).map(item => {
+            const have = item.kind === 'mod' && installed.has(item.url);
             const btn = h('button', {
                 className: have ? 'ft-btn ft-quiet' : 'ft-btn',
                 disabled: have,
                 onclick: async () => {
                     btn.disabled = true;
-                    btn.textContent = 'Installing…';
+                    btn.textContent = item.kind === 'extension' ? 'Adding…' : 'Installing…';
                     try {
-                        await api.mods.loadURL(m.url);
-                        btn.textContent = 'Installed';
+                        btn.textContent = await installItem(api, item);
                         btn.className = 'ft-btn ft-quiet';
                     } catch (e) {
                         btn.disabled = false;
-                        btn.textContent = 'Install';
-                        say(e.message);
+                        btn.textContent = item.kind === 'extension' ? 'Add' : 'Install';
+                        say(e.message || String(e));
                     }
                 }
-            }, have ? 'Installed' : 'Install');
+            }, have ? 'Installed' : (item.kind === 'extension' ? 'Add' : 'Install'));
+            const buttons = [btn];
+            if (session && session.admin) {
+                const approve = h('button', {
+                    className: 'ft-btn ft-quiet',
+                    onclick: async () => {
+                        approve.disabled = true;
+                        try {
+                            const updated = await setApproved(item.id, !item.approved, session);
+                            say(`${updated.name} is now ${updated.approved ? 'approved' : 'community'}.`);
+                            refresh();
+                        } catch (e) {
+                            approve.disabled = false;
+                            say(e.message);
+                        }
+                    }
+                }, item.approved ? 'Unapprove' : 'Approve');
+                buttons.push(approve);
+            }
             return h('div', {className: 'ft-item'},
                 h('div', {className: 'ft-item-main'},
-                    h('div', {className: 'ft-item-title', title: m.name}, m.name),
+                    h('div', {className: 'ft-note'}, sectionFor(item).note),
+                    h('div', {className: 'ft-item-title', title: item.name}, item.name),
                     h('div', {className: 'ft-muted'},
-                        [m.description, m.author ? `by @${m.author}` : ''].filter(Boolean).join(' · ') || ' ')),
-                btn);
+                        [item.description, item.author ? `by @${item.author}` : ''].filter(Boolean).join(' · ') || ' ')),
+                ...buttons);
         }));
     };
 
-    const refresh = () => fetchMods().then(draw)
-        .catch(e => list.replaceChildren(h('div', {className: 'ft-muted'}, `Couldn't load community mods: ${e.message}`)));
+    const refresh = () => fetchItems().then(draw)
+        .catch(e => list.replaceChildren(h('div', {className: 'ft-muted'}, `Couldn't load community items: ${e.message}`)));
 
     const showWho = () => {
         const session = store.get();
         who.replaceChildren();
         if (!session) return;
-        who.append(`Uploading as @${session.username} · `,
+        who.append(`Publishing as @${session.username}${session.admin ? ' (admin)' : ''} · `,
             h('a', {
                 href: '#',
                 onclick: e => {
                     e.preventDefault();
                     store.set(null);
                     showWho();
+                    refresh();
                     say('Signed out.');
                 }
             }, 'Sign out'));
     };
 
-    let upload = null;
-    if (canUpload()) {
-        upload = h('button', {
+    const publishButton = (kind, label) => {
+        const btn = h('button', {
             className: 'ft-btn',
             onclick: async () => {
-                upload.disabled = true;
+                btn.disabled = true;
                 try {
                     let session = store.get();
                     if (!session) {
                         session = await signIn(say);
                         showWho();
-                        say(`Signed in as @${session.username}. Pick your mod.`);
+                        refresh();
+                        say(`Signed in as @${session.username}. Pick your ${kind} file.`);
                     }
                     const file = await pickJsFile();
                     if (!file) return say('');
-                    say(`Uploading ${file.name}…`);
-                    const mod = await uploadMod(file, session);
-                    say(`Uploaded "${mod.name}". Everyone can install it from Community mods now.`);
-                    api.ui.toast(`Uploaded ${mod.name} 🍌`);
+                    say(`Publishing ${file.name}…`);
+                    const item = await publishFile(file, kind, session);
+                    say(`Published "${item.name}" as ${sectionFor(item).note}. Everyone can get it now.`);
+                    api.ui.toast(`Published ${item.name} 🍌`);
                     refresh();
                 } catch (e) {
                     say(e.message);
                     showWho();
                 } finally {
-                    upload.disabled = false;
+                    btn.disabled = false;
                 }
             }
-        }, '🍌 Upload a mod');
-        showWho();
-    }
+        }, label);
+        return btn;
+    };
+
+    const publish = canPublish() ?
+        h('div', {className: 'ft-row'},
+            publishButton('mod', '🍌 Upload a mod'),
+            publishButton('extension', '🧩 Publish an extension')) :
+        h('div', {className: 'ft-muted'}, 'Publish mods and extensions from the fromturbo DMG app.');
+    if (canPublish()) showWho();
 
     refresh();
     return h('div', {className: 'ft-list'},
-        h('div', {className: 'ft-row', style: {justifyContent: 'space-between'}},
-            h('strong', {}, 'Community mods'),
-            upload || h('span', {className: 'ft-muted'}, 'Upload from the fromturbo DMG app')),
-        upload ? who : null,
+        h('strong', {}, 'Community'),
+        publish,
+        canPublish() ? who : null,
         list,
         status);
 };
 
-export {communitySection, canUpload, API as MODS_API};
+export {communitySection, canPublish, fetchItems, installItem, API as MODS_API};

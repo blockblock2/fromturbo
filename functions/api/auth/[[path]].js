@@ -8,7 +8,7 @@
 // The app makes a random nonce, opens /start in the person's browser, and polls until
 // the sign-in lands. Only the Scratch username is kept.
 
-import {AUTH_BASE, NONCE_RE, bearer, mintToken, readToken} from '../_auth.js';
+import {AUTH_BASE, NONCE_RE, bearer, isAdmin, mintToken, readToken} from '../_auth.js';
 
 const CORS = {
     'Access-Control-Allow-Origin': '*',
@@ -42,7 +42,7 @@ export async function onRequestGet ({request, env, params}) {
 
     if (action === 'me') {
         const username = await readToken(bearer(request), env.SESSION_SECRET);
-        return username ? json({username}) : json({error: 'Not signed in'}, 401);
+        return username ? json({username, admin: isAdmin(username, env)}) : json({error: 'Not signed in'}, 401);
     }
 
     if (!configured(env)) {
@@ -78,7 +78,7 @@ export async function onRequestGet ({request, env, params}) {
         }
         const token = await mintToken(data.username, env.SESSION_SECRET);
         await env.AUTH_KV.delete(`pending:${nonce}`);
-        await env.AUTH_KV.put(`done:${nonce}`, JSON.stringify({username: data.username, token}), {expirationTtl: 600});
+        await env.AUTH_KV.put(`done:${nonce}`, JSON.stringify({username: data.username, token, admin: isAdmin(data.username, env)}), {expirationTtl: 600});
         return page(`Signed in as ${data.username}`, 'You can close this tab and go back to fromturbo.');
     }
 

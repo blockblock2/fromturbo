@@ -1,7 +1,4 @@
-import {APP_NAME} from '../brand';
+import {SECTIONS, SECTION_ORDER} from '../../fromturbo/sections';
 
-// Because there are all brand names, it is unnecessary for them to be translatable.
-export default [
-    {tag: 'scratch', intlLabel: 'Scratch'},
-    {tag: 'tw', intlLabel: APP_NAME}
-];
+// fromturbo: one filter button per section. These are names, so they aren't translated.
+export default SECTION_ORDER.map(key => ({tag: SECTIONS[key].tag, intlLabel: SECTIONS[key].label}));

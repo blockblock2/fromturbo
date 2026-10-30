@@ -240,3 +240,16 @@
 .library-item:hover .favorite-container {
     display: block;
 }
+
+/* fromturbo: little note above the name saying which section a card is in */
+.library-item-note {
+    display: table;
+    margin-bottom: 0.3rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+    color: $looks-secondary;
+    background: $looks-light-transparent;
+}

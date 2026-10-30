@@ -44,4 +44,10 @@ export const bearer = request => {
     return h.startsWith('Bearer ') ? h.slice(7).trim() : null;
 };
 
+// Scratch usernames allowed to approve community mods and extensions.
+export const isAdmin = (username, env) => String(env.ADMINS || 'blockblock2').toLowerCase()
+    .split(/[\s,]+/)
+    .filter(Boolean)
+    .includes(String(username || '').toLowerCase());
+
 export const NONCE_RE = /^[A-Za-z0-9_-]{24,64}$/;

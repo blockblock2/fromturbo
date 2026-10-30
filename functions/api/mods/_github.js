@@ -79,3 +79,20 @@ export const readIndex = async env => {
     }
     return {mods, sha: file.sha};
 };
+
+/**
+ * Change index.json with change(list) → newList, retrying if someone else
+ * changed it at the same moment.
+ */
+export const updateIndex = async (env, change, message) => {
+    for (let attempt = 0; ; attempt++) {
+        const {mods, sha} = await readIndex(env);
+        try {
+            await writeFile(env, 'index.json', `${JSON.stringify({mods: change(mods)}, null, 2)}\n`, message, sha || undefined);
+            return;
+        } catch (e) {
+            if (attempt >= 4 || ![409, 422].includes(e.status)) throw e;
+            await new Promise(r => setTimeout(r, 300 + (Math.random() * 400)));
+        }
+    }
+};

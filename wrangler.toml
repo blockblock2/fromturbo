@@ -15,3 +15,5 @@ id = "6c37ef7548d54ccc9c87c9e515e17fc3"
 # Secrets (set once, see README): GH_TOKEN, SESSION_SECRET
 [vars]
 MODS_REPO = "blockblock2/fromturbo-mods"
+# Scratch usernames that can approve community mods and extensions
+ADMINS = "blockblock2"

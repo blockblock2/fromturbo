@@ -6,6 +6,7 @@ import scratchity from './mods/scratchity';
 import colab from './mods/colab';
 import scratchpack from './mods/scratchpack';
 import {rebrandBuiltinBlocks} from './brand';
+import {SECTIONS} from './sections';
 import {communitySection} from './community';
 
 const BUILT_IN = [scratchity, colab, scratchpack];
@@ -50,6 +51,7 @@ const openManager = () => api.ui.openPanel({
                 return h('div', {className: 'ft-item'},
                     toggle,
                     h('div', {className: 'ft-item-main'},
+                        m.builtIn ? h('div', {className: 'ft-note'}, SECTIONS.ftModApproved.note) : null,
                         h('div', {className: 'ft-item-title'}, m.name, m.builtIn ? h('span', {className: 'ft-muted'}, '  built-in') : null),
                         h('div', {className: 'ft-muted'}, m.description || m.source)),
                     remove);

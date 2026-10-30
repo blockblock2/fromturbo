@@ -47,6 +47,11 @@ const CSS = `
 .ft-btn.ft-quiet { background: var(--ui-tertiary, #e9eef2); color: inherit; }
 .ft-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .ft-muted { opacity: .7; font-size: 12px; }
+.ft-note {
+    display: inline-block; margin-bottom: 2px; padding: 1px 7px; border-radius: 999px;
+    font-size: 10.5px; font-weight: bold; letter-spacing: .02em;
+    background: var(--looks-transparent, rgba(76, 151, 255, .2)); color: var(--looks-secondary, #4c97ff);
+}
 .ft-pre {
     max-height: 200px; overflow: auto; margin: 0; padding: 8px; border-radius: 6px;
     background: var(--ui-tertiary, #f2f2f2); font: 11px/1.4 ui-monospace, Menlo, monospace; white-space: pre-wrap;

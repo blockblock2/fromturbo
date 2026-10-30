@@ -135,11 +135,19 @@
 
 <section>
   <h2>Share it with everyone</h2>
-  <p>In the fromturbo DMG app, open <b>Mods</b> and press <b>🍌 Upload a mod</b>, then pick your <code>.js</code> file. That's it: it shows up under <b>Community mods</b> for everyone, on the website and in the app, with an <b>Install</b> button.</p>
-  <p>Get the DMG app with <a href="https://www.npmjs.com/package/@blockblock2/bananapeel">BananaPeel</a> (the version from <code>bananapeel install</code> doesn't have Upload):</p>
-<pre><code>bananapeel dmg blockblock2/fromturbo@mac</code></pre>
-  <p>The first time, it asks you to sign in with Scratch (Scratch Auth). Your mod is credited to your Scratch username, never a real name.</p>
-  <p class="muted">The name and description come from your <code>fromturbo.mods.register({...})</code> call. Mods can be up to 200 KB. Community mods aren't checked by anyone, so install the ones you trust.</p>
+  <p>In the fromturbo DMG app, open <b>Mods</b> and press <b>🍌 Upload a mod</b> or <b>🧩 Publish an extension</b>, then pick your <code>.js</code> file. It shows up for everyone in the Mods panel and in the extension library.</p>
+  <p>The first time, it asks you to sign in with Scratch (Scratch Auth). What you publish is credited to your Scratch username, never a real name.</p>
+  <p>Get the DMG app with <a href="https://www.npmjs.com/package/@blockblock2/bananapeel">BananaPeel</a> (the version from <code>bananapeel install</code> can't publish):</p>
+<pre><code>bananapeel dmg blockblock2/fromturbo-app</code></pre>
+  <h3>Sections</h3>
+  <p>The extension library has a filter button for each section, and every card has a small note saying which one it's in:</p>
+  <table>
+    <tr><td><b>Scratch</b></td><td>Scratch's own extensions.</td></tr>
+    <tr><td><b>TurboWarp</b></td><td>TurboWarp's extensions and its extension gallery.</td></tr>
+    <tr><td><b>fromturbo extensions ✓</b> / <b>fromturbo mods ✓</b></td><td>Approved by fromturbo, including the built-in mods.</td></tr>
+    <tr><td><b>Community extensions</b> / <b>Community mods</b></td><td>Published by anyone, not checked yet.</td></tr>
+  </table>
+  <p class="muted">Mods need a <code>fromturbo.mods.register({...})</code> call and extensions a <code>Scratch.extensions.register(...)</code> call. The name and description come from your code. Files can be up to 200 KB. Community items aren't checked by anyone, so only add ones you trust.</p>
 </section>
 
 <section>

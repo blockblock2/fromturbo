@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Making fromturbo mods</title>
+<title>Making fromturbo mods and extensions</title>
 <style>
   :root {
-    --bg: #f7f6fb; --card: #ffffff; --text: #2b2d42; --muted: #6b6f85;
-    --accent: #855cd6; --code-bg: #f0edf8; --border: #e3dff0;
+    --bg: #f3f7fe; --card: #ffffff; --text: #2b2d42; --muted: #6b6f85;
+    --accent: #2f74e0; --code-bg: #eaf2ff; --border: #d3e2fb;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #15141c; --card: #1f1d29; --text: #ecebf3; --muted: #a3a1b5; --accent: #b393ff; --code-bg: #2a2737; --border: #34304a; }
+    :root { --bg: #0f1626; --card: #182238; --text: #ecebf3; --muted: #a3a1b5; --accent: #6ab0ff; --code-bg: #1d2a44; --border: #26334f; }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif; }
@@ -31,19 +31,36 @@
   td:first-child { white-space: nowrap; }
   .muted { color: var(--muted); }
   a { color: var(--accent); }
+  section { overflow-wrap: anywhere; }
+  td code { overflow-wrap: anywhere; }
+  @media (max-width: 640px) {
+    td:first-child { white-space: normal; }
+    section { padding: 16px; }
+    td { display: block; border-top: none; padding: 3px 4px; }
+    tr { display: block; border-top: 1px solid var(--border); padding: 6px 0; }
+  }
+  .toc { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 4px 0; }
   .btn { display: inline-block; background: var(--accent); color: #fff; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: bold; }
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <h1>Making fromturbo mods</h1>
+    <h1>Making fromturbo mods and extensions</h1>
     <p>A fast Scratch editor with a mod API anyone can use. <a href="../editor.html">Open the editor →</a></p>
   </div>
 </header>
 <main>
 
-<section>
+<nav class="toc">
+  <a class="btn" href="#mods">Mods</a>
+  <a class="btn" href="#extensions">Extensions</a>
+  <a class="btn" href="#share">Share it</a>
+</nav>
+
+<section id="mods">
   <h2>Your first mod in 30 seconds</h2>
   <p>A mod is one JavaScript file. It calls <code>fromturbo.mods.register</code> and gets the whole API passed in.</p>
 <pre><code>fromturbo.mods.register({
@@ -103,10 +120,254 @@
   </table>
 </section>
 
+<section id="extensions">
+  <h2>Your first extension in 30 seconds</h2>
+  <p>An <b>extension</b> adds new blocks to the block palette. A <b>mod</b> changes the editor; an extension changes what projects can do. An extension is one JavaScript file in the standard Scratch custom extension format, so it also works in TurboWarp.</p>
+<pre><code>(function (Scratch) {
+    'use strict';
+    class HelloBlocks {
+        getInfo () {
+            return {
+                id: 'helloblocks',
+                name: 'Hello Blocks',
+                blocks: [{
+                    opcode: 'hello',
+                    blockType: Scratch.BlockType.REPORTER,
+                    text: 'hello [NAME]',
+                    arguments: {NAME: {type: Scratch.ArgumentType.STRING, defaultValue: 'world'}}
+                }]
+            };
+        }
+        hello ({NAME}) {
+            return `Hello, ${NAME}!`;
+        }
+    }
+    Scratch.extensions.register(new HelloBlocks());
+})(Scratch);</code></pre>
+  <p>This adds a <b>Hello Blocks</b> category with one round block, <b>hello (world)</b>, that reports <i>Hello, world!</i></p>
+  <h3>Try it</h3>
+  <ol>
+    <li>In the editor, click <b>Add Extension</b> (bottom-left), then <b>Custom Extension</b>.</li>
+    <li>Choose <b>Text</b>, paste your code, and tick <b>Run without sandbox</b> if your extension needs the editor (see <a href="#sandbox">Sandboxed or not</a>).</li>
+    <li>Press <b>Load</b>. Your blocks appear in their own colour in the palette.</li>
+  </ol>
+  <p>You can also load it from a file (<b>Files</b> tab) or a link (<b>URL</b> tab, or <b>Mods → Add a custom extension</b>).</p>
+  <p><a class="btn" href="example-extension.js">See the example extension</a></p>
+</section>
+
 <section>
-  <h2>Custom blocks (extensions)</h2>
-  <p>fromturbo runs standard custom extensions, so everything in the extension gallery works. Add one from <b>Mods → Add a custom extension</b>, or from the normal extension library.</p>
-  <p>Mods can add blocks without a separate file:</p>
+  <h2>The extension API</h2>
+
+  <h3><code>getInfo()</code>: describes your extension</h3>
+  <table>
+    <tr><td><code>id</code></td><td><b>Required.</b> Letters and numbers only, unique (e.g. <code>gridsnap</code>). Block opcodes become <code>id_opcode</code> inside projects, so don't change it later.</td></tr>
+    <tr><td><code>name</code></td><td>The category name in the palette.</td></tr>
+    <tr><td><code>color1</code>, <code>color2</code>, <code>color3</code></td><td>Block colour, its darker shade, and the border, as <code>#rrggbb</code>. Only <code>color1</code> is needed; the others are worked out.</td></tr>
+    <tr><td><code>menuIconURI</code></td><td>Picture for the category bubble (a data: URI or link).</td></tr>
+    <tr><td><code>blockIconURI</code></td><td>Picture shown at the start of every block.</td></tr>
+    <tr><td><code>docsURI</code></td><td>Adds a <b>?</b> button to the palette that opens this link.</td></tr>
+    <tr><td><code>blocks</code></td><td>The list of blocks (below).</td></tr>
+    <tr><td><code>menus</code></td><td>Drop-down menus your blocks use (below).</td></tr>
+  </table>
+
+  <h3>Blocks</h3>
+  <table>
+    <tr><td><code>opcode</code></td><td><b>Required.</b> The name of the method that runs, e.g. <code>'hello'</code> runs <code>hello(args, util)</code>.</td></tr>
+    <tr><td><code>blockType</code></td><td>The shape (next table).</td></tr>
+    <tr><td><code>text</code></td><td>What the block says. <code>[NAME]</code> marks an input. Use an array of strings for C-blocks with more than one part.</td></tr>
+    <tr><td><code>arguments</code></td><td>One entry per <code>[INPUT]</code>: <code>{type, defaultValue, menu}</code>.</td></tr>
+    <tr><td><code>isTerminal</code></td><td><code>true</code> = nothing can attach below (like <i>stop all</i>).</td></tr>
+    <tr><td><code>disableMonitor</code></td><td><code>true</code> = reporters get no checkbox to show on stage.</td></tr>
+    <tr><td><code>hideFromPalette</code></td><td><code>true</code> = hidden from the palette (old blocks you still support).</td></tr>
+    <tr><td><code>filter</code></td><td><code>[Scratch.TargetType.SPRITE]</code> or <code>[Scratch.TargetType.STAGE]</code>: only show for sprites, or only for the Stage.</td></tr>
+    <tr><td><code>isEdgeActivated</code></td><td>Hats only. <code>true</code> (default): the hat runs when your method <i>changes</i> from false to true. <code>false</code>: it runs every frame your method returns true.</td></tr>
+    <tr><td><code>branchCount</code></td><td>C-blocks: how many slots for blocks inside (1 or more).</td></tr>
+    <tr><td><code>func</code></td><td>Buttons only: the name of the method to run when clicked.</td></tr>
+  </table>
+
+  <h3>Block types: <code>Scratch.BlockType.…</code></h3>
+  <table>
+    <tr><td><code>COMMAND</code></td><td>A normal stack block, like <i>move 10 steps</i>.</td></tr>
+    <tr><td><code>REPORTER</code></td><td>Round; gives back a value.</td></tr>
+    <tr><td><code>BOOLEAN</code></td><td>Pointy; gives back true or false.</td></tr>
+    <tr><td><code>HAT</code></td><td>Starts a script when your method returns true (checked every frame).</td></tr>
+    <tr><td><code>EVENT</code></td><td>A hat that only starts when your code says so (<code>Scratch.vm.runtime.startHats(...)</code>).</td></tr>
+    <tr><td><code>CONDITIONAL</code></td><td>A C-block like <i>if</i>: runs a slot when you call <code>util.startBranch(1, false)</code>.</td></tr>
+    <tr><td><code>LOOP</code></td><td>A C-block like <i>repeat</i>: <code>util.startBranch(1, true)</code> runs the slot and comes back.</td></tr>
+    <tr><td><code>BUTTON</code></td><td>A button in the palette (like <i>Make a Variable</i>); runs <code>func</code>.</td></tr>
+    <tr><td><code>LABEL</code></td><td>A heading in the palette, not a block.</td></tr>
+    <tr><td><code>XML</code></td><td>Raw palette XML (advanced; use <code>xml: '&lt;sep gap="36"/&gt;'</code> for a gap).</td></tr>
+  </table>
+  <p class="muted">Write <code>'---'</code> in the <code>blocks</code> list for a small gap between blocks.</p>
+
+  <h3>Inputs: <code>Scratch.ArgumentType.…</code></h3>
+  <table>
+    <tr><td><code>STRING</code></td><td>A text box.</td></tr>
+    <tr><td><code>NUMBER</code></td><td>A round number box.</td></tr>
+    <tr><td><code>BOOLEAN</code></td><td>A pointy slot for true/false blocks.</td></tr>
+    <tr><td><code>COLOR</code></td><td>A colour picker; you get <code>'#rrggbb'</code>.</td></tr>
+    <tr><td><code>ANGLE</code></td><td>A number with a direction dial.</td></tr>
+    <tr><td><code>MATRIX</code></td><td>A 5×5 grid; you get a string of 25 <code>0</code>/<code>1</code>.</td></tr>
+    <tr><td><code>NOTE</code></td><td>A piano keyboard; you get a MIDI note number.</td></tr>
+    <tr><td><code>COSTUME</code> / <code>SOUND</code></td><td>A menu of the sprite's costumes or sounds.</td></tr>
+    <tr><td><code>IMAGE</code></td><td>A picture inside the block (use <code>dataURI</code> instead of <code>defaultValue</code>).</td></tr>
+  </table>
+
+  <h3>Menus</h3>
+<pre><code>getInfo () {
+    return {
+        id: 'menudemo',
+        name: 'Menu Demo',
+        blocks: [{
+            opcode: 'pick',
+            blockType: Scratch.BlockType.REPORTER,
+            text: 'size of [SIZE] in [SPRITE]',
+            arguments: {
+                SIZE: {type: Scratch.ArgumentType.STRING, menu: 'sizes', defaultValue: 'big'},
+                SPRITE: {type: Scratch.ArgumentType.STRING, menu: 'sprites'}
+            }
+        }],
+        menus: {
+            // A fixed list. Items can be strings, or {text, value} when they should differ.
+            sizes: {acceptReporters: true, items: ['small', 'big', {text: 'huge!', value: 'huge'}]},
+            // A list worked out each time the menu opens: the name of a method.
+            sprites: {acceptReporters: true, items: 'spriteNames'}
+        }
+    };
+}
+spriteNames () {
+    const names = Scratch.vm.runtime.targets.filter(t => t.isOriginal && !t.isStage).map(t => t.getName());
+    return names.length ? names : [''];
+}</code></pre>
+  <p><code>acceptReporters: true</code> lets people drop a reporter into the menu. Without it, it's a fixed drop-down. A menu must never be an empty list.</p>
+
+  <h3>Your block methods</h3>
+  <p>Each block runs <code>method(args, util)</code>:</p>
+  <table>
+    <tr><td><code>args</code></td><td>The inputs by name, e.g. <code>{NAME: 'world'}</code>. Values can be numbers or text whatever the type, so convert them with <code>Scratch.Cast</code>.</td></tr>
+    <tr><td><code>util.target</code></td><td>The sprite running the block: <code>util.target.x</code>, <code>.y</code>, <code>.setXY(x, y)</code>, <code>.getName()</code>, <code>.lookupVariableByNameAndType(name, '')</code>…</td></tr>
+    <tr><td><code>util.stackFrame</code></td><td>An object kept between runs of the same block in a loop (handy for counters).</td></tr>
+    <tr><td><code>util.startBranch(n, isLoop)</code></td><td>C-blocks: run slot <code>n</code>; <code>isLoop</code> brings it back to your block afterwards.</td></tr>
+    <tr><td><code>return value</code></td><td>Reporters and booleans give back this value. Return a <b>Promise</b> (or use <code>async</code>) and the script waits for it.</td></tr>
+  </table>
+
+  <h3>The <code>Scratch</code> object</h3>
+  <table>
+    <tr><td><code>Scratch.Cast.toNumber(x)</code>, <code>toString</code>, <code>toBoolean</code>, <code>compare(a, b)</code>, <code>toRgbColorList(x)</code></td><td>Convert inputs the same way Scratch does.</td></tr>
+    <tr><td><code>Scratch.vm</code></td><td>The Scratch VM: <code>Scratch.vm.runtime.targets</code>, <code>.startHats(...)</code>, <code>.ioDevices</code>… <b>Unsandboxed only.</b></td></tr>
+    <tr><td><code>Scratch.renderer</code></td><td>The stage renderer (for drawing effects). <b>Unsandboxed only.</b></td></tr>
+    <tr><td><code>await Scratch.fetch(url)</code></td><td>Like <code>fetch</code>, but asks the person first if the site isn't trusted.</td></tr>
+    <tr><td><code>await Scratch.canFetch(url)</code></td><td>Whether a request to that site is allowed.</td></tr>
+    <tr><td><code>await Scratch.openWindow(url)</code> / <code>Scratch.redirect(url)</code></td><td>Open a new tab, or go to another page, after asking.</td></tr>
+    <tr><td><code>await Scratch.download(url, name)</code></td><td>Save a file to the person's computer, after asking.</td></tr>
+    <tr><td><code>Scratch.translate('text')</code></td><td>Marks text for translation (returns it unchanged if there's none).</td></tr>
+    <tr><td><code>Scratch.extensions.unsandboxed</code></td><td><code>true</code> when running unsandboxed. Check it first if you need <code>Scratch.vm</code>.</td></tr>
+  </table>
+
+  <h3 id="sandbox">Sandboxed or not</h3>
+  <table>
+    <tr><td><b>Sandboxed</b> (default)</td><td>Runs in a separate, locked-down worker. It can only use its inputs and <code>Scratch.Cast</code> / <code>Scratch.fetch</code>; no <code>Scratch.vm</code>, no page, no sprites beyond its inputs. Safe for anyone to load.</td></tr>
+    <tr><td><b>Unsandboxed</b></td><td>Runs in the editor itself with full access (<code>Scratch.vm</code>, <code>util.target</code> methods, the stage, the page). Needs <b>Run without sandbox</b> ticked, or people are asked when they load it from a link. Start the file with <code>if (!Scratch.extensions.unsandboxed) throw new Error('This extension must run unsandboxed');</code></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>Extension examples</h2>
+
+  <h3>A hat that fires when something happens</h3>
+<pre><code>(function (Scratch) {
+    'use strict';
+    if (!Scratch.extensions.unsandboxed) throw new Error('This extension must run unsandboxed');
+    class Clock {
+        getInfo () {
+            return {
+                id: 'clockhats',
+                name: 'Clock',
+                blocks: [
+                    {opcode: 'whenMinute', blockType: Scratch.BlockType.EVENT, text: 'when the minute changes', isEdgeActivated: false},
+                    {opcode: 'whenAfter', blockType: Scratch.BlockType.HAT, text: 'when it is after [HOUR] o\'clock',
+                        arguments: {HOUR: {type: Scratch.ArgumentType.NUMBER, defaultValue: 17}}}
+                ]
+            };
+        }
+        // HAT: checked every frame; the script starts when this turns true.
+        whenAfter ({HOUR}) { return new Date().getHours() &gt;= Scratch.Cast.toNumber(HOUR); }
+    }
+    Scratch.extensions.register(new Clock());
+    // EVENT: started by our own code.
+    let last = new Date().getMinutes();
+    setInterval(() =&gt; {
+        if (new Date().getMinutes() !== last) {
+            last = new Date().getMinutes();
+            Scratch.vm.runtime.startHats('clockhats_whenMinute');
+        }
+    }, 1000);
+})(Scratch);</code></pre>
+
+  <h3>A block that waits for the internet</h3>
+<pre><code>(function (Scratch) {
+    'use strict';
+    class WebText {
+        getInfo () {
+            return {
+                id: 'webtext',
+                name: 'Web Text',
+                blocks: [{opcode: 'get', blockType: Scratch.BlockType.REPORTER, text: 'text from [URL]',
+                    arguments: {URL: {type: Scratch.ArgumentType.STRING, defaultValue: 'https://example.com'}}}]
+            };
+        }
+        async get ({URL}) {
+            try {
+                const res = await Scratch.fetch(Scratch.Cast.toString(URL));
+                return (await res.text()).slice(0, 10000);
+            } catch (e) {
+                return '';   // never throw: an error stops the script
+            }
+        }
+    }
+    Scratch.extensions.register(new WebText());
+})(Scratch);</code></pre>
+
+  <h3>A C-block that repeats</h3>
+<pre><code>// in blocks:
+{opcode: 'twice', blockType: Scratch.BlockType.LOOP, text: 'do twice'}
+
+// the method: util.stackFrame remembers the count between rounds
+twice (args, util) {
+    if (typeof util.stackFrame.loops === 'undefined') util.stackFrame.loops = 0;
+    if (util.stackFrame.loops &lt; 2) {
+        util.stackFrame.loops++;
+        util.startBranch(1, true);
+    }
+}</code></pre>
+
+  <h3>Blocks that move the sprite</h3>
+<pre><code>// in blocks:
+{opcode: 'jump', blockType: Scratch.BlockType.COMMAND, text: 'jump to the middle', filter: [Scratch.TargetType.SPRITE]}
+
+// the method (unsandboxed): util.target is the sprite running it
+jump (args, util) {
+    util.target.setXY(0, 0);
+}</code></pre>
+</section>
+
+<section>
+  <h2>Sharing your extension</h2>
+  <table>
+    <tr><td><b>Publish it</b></td><td>In the fromturbo DMG app: <b>Mods → 🧩 Publish an extension</b>, pick your file. It shows up for everyone (see <a href="#share">Share it with everyone</a>).</td></tr>
+    <tr><td><b>A link</b></td><td>Host the <code>.js</code> file anywhere, then send <code>fromturbo.pages.dev/editor.html?extension=YOUR_URL</code>. It opens the editor with your extension loaded (people are asked first if it's unsandboxed).</td></tr>
+    <tr><td><b>In a project</b></td><td>Projects remember extensions loaded from a link and load them again when opened. Extensions pasted as text are saved inside the project.</td></tr>
+  </table>
+  <h3>Tips</h3>
+  <ul>
+    <li>Never change <code>id</code> or an <code>opcode</code> after people use your extension: their projects would lose those blocks.</li>
+    <li>Don't throw errors from a block; return a sensible value instead. An error stops the whole script.</li>
+    <li>Always convert inputs with <code>Scratch.Cast</code>. A NUMBER input can still get text dropped into it.</li>
+    <li>For the TurboWarp-compatible docs and many more examples, see <a href="https://docs.turbowarp.org/development/extensions/introduction">docs.turbowarp.org</a>.</li>
+  </ul>
+
+  <h3>Blocks from a mod</h3>
+  <p>A mod can add blocks without a separate file, using the same format:</p>
 <pre><code>fromturbo.mods.register({
     id: 'my-blocks',
     name: 'My Blocks',
@@ -129,11 +390,10 @@
         });
     }
 });</code></pre>
-  <p class="muted">Blocks from <code>define()</code> only exist while the mod is installed. For blocks that should travel with the project, publish an extension file and load it with <code>api.extensions.load(url)</code>.</p>
-  <p><a class="btn" href="example-extension.js">See the example extension</a></p>
+  <p class="muted">Blocks from <code>define()</code> only exist while the mod is installed. For blocks that should travel with a project, make an extension file instead.</p>
 </section>
 
-<section>
+<section id="share">
   <h2>Share it with everyone</h2>
   <p>In the fromturbo DMG app, open <b>Mods</b> and press <b>🍌 Upload a mod</b> or <b>🧩 Publish an extension</b>, then pick your <code>.js</code> file. It shows up for everyone in the Mods panel and in the extension library.</p>
   <p>The first time, it asks you to sign in with Scratch (Scratch Auth). What you publish is credited to your Scratch username, never a real name.</p>

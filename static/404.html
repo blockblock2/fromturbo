@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found · fromturbo</title>
+<link rel="icon" href="/favicon.ico">
+<script>
+  // Old-style project links (/123456, /123456/editor, /123456/fullscreen, /123456/embed)
+  // go to the right page with the project number, instead of this page.
+  (function () {
+    var m = /^\/(\d+)(?:\/(editor|fullscreen|embed))?\/?$/.exec(location.pathname);
+    if (!m) return;
+    var page = { editor: '/editor.html', fullscreen: '/fullscreen.html', embed: '/embed.html' }[m[2]] || '/';
+    location.replace(page + location.search + '#' + m[1]);
+  })();
+</script>
+<style>
+  :root {
+    --bg: #eaf2ff; --card: #ffffff; --text: #1f2a44; --muted: #5d6b86;
+    --accent: #3d8bff; --accent-dark: #1f5cc2; --line: #d3e2fb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1626; --card: #182238; --text: #e8eefb; --muted: #9aa8c4; --accent: #5aa2ff; --accent-dark: #3d8bff; --line: #26334f; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+  header { background: var(--accent); color: #fff; padding: 10px 16px; }
+  header a { color: #fff; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+  header svg { border-radius: 7px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.55); }
+  main { flex: 1; display: grid; place-items: center; padding: 32px 16px; }
+  .card {
+    width: 100%; max-width: 520px; text-align: center;
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 28px 22px 26px; box-shadow: 0 12px 40px rgba(31, 92, 194, .12);
+  }
+  .stage { position: relative; height: 190px; overflow: hidden; border-radius: 12px;
+    background: radial-gradient(ellipse at 50% 120%, rgba(61,139,255,.25), transparent 65%); }
+  .rocket { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); animation: hover 2.6s ease-in-out infinite; }
+  .star { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); opacity: .5; animation: twinkle 2.4s ease-in-out infinite; }
+  @keyframes hover { 0%, 100% { transform: translate(-50%, 0) rotate(-4deg); } 50% { transform: translate(-50%, -10px) rotate(4deg); } }
+  @keyframes twinkle { 0%, 100% { opacity: .15; } 50% { opacity: .8; } }
+  @media (prefers-reduced-motion: reduce) { .rocket, .star { animation: none; } }
+  .code { font-weight: 800; font-size: 14px; letter-spacing: .12em; color: var(--accent); margin: 14px 0 2px; }
+  h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.2; }
+  p { margin: 0 0 18px; color: var(--muted); }
+  .path { display: inline-block; max-width: 100%; overflow-wrap: anywhere; font: 13px ui-monospace, Menlo, monospace;
+    background: var(--bg); border-radius: 6px; padding: 1px 6px; color: var(--text); }
+  .buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 10px 16px; border-radius: 10px; font-weight: 700; text-decoration: none;
+    border: 2px solid var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+  footer { text-align: center; font-size: 13px; color: var(--muted); padding: 14px 16px 22px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header><a href="/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="28" height="28" aria-hidden="true">
+  <defs>
+    <linearGradient id="ft-bg-404" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3d8bff"/>
+      <stop offset="1" stop-color="#1255d6"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#ft-bg-404)"/>
+  <!-- a Scratch-style command block: notch on top, tab underneath -->
+  <path fill="#ffffff" d="M26 40
+           a8 8 0 0 1 8 -8
+           h10 l6 6 h14 l6 -6
+           h24 a8 8 0 0 1 8 8
+           v40 a8 8 0 0 1 -8 8
+           h-24 l-6 6 h-14 l-6 -6
+           h-10 a8 8 0 0 1 -8 -8 z"/>
+  <!-- turbo chevrons -->
+  <path fill="none" stroke="#1a6cf0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"
+        d="M46 47 l14 13 l-14 13 M66 47 l14 13 l-14 13"/>
+</svg>
+fromturbo</a></header>
+<main>
+  <div class="card">
+    <div class="stage">
+      <span class="star" style="left:12%;top:22%"></span>
+      <span class="star" style="left:82%;top:16%;animation-delay:.6s"></span>
+      <span class="star" style="left:70%;top:62%;animation-delay:1.2s"></span>
+      <span class="star" style="left:22%;top:70%;animation-delay:1.8s"></span>
+      <svg class="rocket" xmlns="http://www.w3.org/2000/svg" width="120" height="165" viewBox="0 0 96 132" aria-hidden="true">
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- flame -->
+    <path d="M36 104 Q48 132 60 104 Z" fill="#ffb01f" stroke="#e57a00" stroke-width="3"/>
+    <path d="M42 104 Q48 120 54 104 Z" fill="#fff1b8"/>
+    <!-- fins -->
+    <path d="M24 74 L8 100 Q8 106 15 104 L30 96 Z" fill="#1255d6" stroke="#0b3a99" stroke-width="3"/>
+    <path d="M72 74 L88 100 Q88 106 81 104 L66 96 Z" fill="#1255d6" stroke="#0b3a99" stroke-width="3"/>
+    <!-- body -->
+    <path d="M48 4 C72 18 76 52 72 80 Q70 100 60 104 L36 104 Q26 100 24 80 C20 52 24 18 48 4 Z"
+          fill="#3d8bff" stroke="#0b3a99" stroke-width="3"/>
+    <!-- belly stripe -->
+    <path d="M26 82 Q48 90 70 82" fill="none" stroke="#ffffff" stroke-width="5"/>
+    <!-- window face -->
+    <circle cx="48" cy="46" r="17" fill="#ffffff" stroke="#0b3a99" stroke-width="3"/>
+    <circle cx="42" cy="44" r="3.6" fill="#1f2a44"/>
+    <circle cx="54" cy="44" r="3.6" fill="#1f2a44"/>
+    <circle cx="43.2" cy="42.8" r="1.2" fill="#ffffff"/>
+    <circle cx="55.2" cy="42.8" r="1.2" fill="#ffffff"/>
+    <path d="M42 51 Q48 57 54 51" fill="none" stroke="#1f2a44" stroke-width="2.6"/>
+    <circle cx="37.5" cy="51" r="2.6" fill="#ff8fb1" opacity="0.8"/>
+    <circle cx="58.5" cy="51" r="2.6" fill="#ff8fb1" opacity="0.8"/>
+    <!-- nose cap -->
+    <path d="M38 14 Q48 2 58 14 Q48 10 38 14 Z" fill="#ffffff" opacity="0.6"/>
+  </g>
+</svg>
+
+    </div>
+    <div class="code">404</div>
+    <h1>This page flew off the stage</h1>
+    <p>There's nothing at <span class="path" id="path"></span>. It may have moved, or the link has a typo.</p>
+    <div class="buttons">
+      <a class="btn primary" href="/editor.html">Open the editor</a>
+      <a class="btn" href="/">Home</a>
+      <a class="btn" href="/mods/index.html">Make a mod</a>
+    </div>
+  </div>
+</main>
+<footer>Think something's broken? <a href="https://github.com/blockblock2/fromturbo/issues">Tell us on GitHub</a>.</footer>
+<script>document.getElementById('path').textContent = location.pathname;</script>
+</body>
+</html>

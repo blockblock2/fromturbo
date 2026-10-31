@@ -310,6 +310,7 @@ const mods = {
             description: e.def.description || '',
             author: e.def.author || '',
             builtIn: !!e.def.builtIn,
+            extensionId: e.def.extensionId || null,
             source: e.source,
             enabled: isEnabled(e.def),
             running: e.running

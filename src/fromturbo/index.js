@@ -10,8 +10,9 @@ import {SECTIONS} from './sections';
 import {communitySection} from './community';
 import {leaveEmbedHost} from './embed-host';
 import embed from './mods/embed';
+import esp32 from './mods/esp32';
 
-const BUILT_IN = [scratchity, colab, scratchpack, embed];
+const BUILT_IN = [scratchity, colab, scratchpack, embed, esp32];
 const DOCS_URL = location.protocol === 'file:' ? 'https://fromturbo.pages.dev/mods/' : 'mods/';
 
 // Mods loaded with ?mod=URL. Running someone's mod gives it full control of the editor,

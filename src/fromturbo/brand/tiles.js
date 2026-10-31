@@ -24,7 +24,8 @@ export const BUILTIN_MOD_TILES = {
     'scratchity': tile({...BLUE, glyph: '✨', label: 'Scratchity'}),
     'colab': tile({...BLUE, glyph: '👥', label: 'Scratch Colab'}),
     'scratchpack': tile({...BLUE, glyph: '📦', label: '.scratchpack'}),
-    'embed': tile({...BLUE, glyph: '🖼️', label: 'Embed'})
+    'embed': tile({...BLUE, glyph: '🖼️', label: 'Embed'}),
+    'esp32': tile({from: '#e7352c', to: '#9e1f18', glyph: '📟', label: 'ESP32'})
 };
 
 /** Picture for a community item, coloured by whether it's approved. */

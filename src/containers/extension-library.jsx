@@ -47,11 +47,23 @@ const toLibraryItem = extension => {
 };
 
 // fromturbo's own mods (Scratchity, Colab, .scratchpack) as cards.
+// A mod that brings blocks (like ESP32) is a card in the extensions section instead:
+// picking it switches the mod on and adds its blocks.
 const builtinModItems = () => {
     const ft = window.fromturbo;
     if (!ft) return [];
     return ft.mods.list().filter(m => m.builtIn)
-        .map(m => ({
+        .map(m => (m.extensionId ? {
+            name: m.name,
+            description: m.description,
+            extensionId: m.extensionId,
+            builtinModId: m.id,
+            addsExtension: true,
+            iconURL: BUILTIN_MOD_TILES[m.id] || MOD_FALLBACK_TILE,
+            section: SECTIONS.ftExtApproved,
+            incompatibleWithScratch: true,
+            featured: true
+        } : {
             name: m.name,
             description: m.enabled ? `${m.description} (On)` : m.description,
             extensionId: `ftmod-${m.id}`,
@@ -177,8 +189,13 @@ class ExtensionLibrary extends React.PureComponent {
 
         const extensionId = item.extensionId;
 
+        // A built-in mod with blocks: make sure it's on, then add its blocks like any extension.
+        if (item.addsExtension && window.fromturbo) {
+            window.fromturbo.mods.setEnabled(item.builtinModId, true);
+        }
+
         // fromturbo mods are installed (or switched on) instead of added to the project.
-        if (item.builtinModId || item.modURL) {
+        if (!item.addsExtension && (item.builtinModId || item.modURL)) {
             const ft = window.fromturbo;
             if (!ft) return;
             const done = message => ft.ui.toast(message);
@@ -235,9 +252,13 @@ class ExtensionLibrary extends React.PureComponent {
                 builtins.filter(inSection(SECTIONS.scratch)),
                 [
                     ...builtins.filter(inSection(SECTIONS.ftExtApproved)),
+                    ...mods.filter(inSection(SECTIONS.ftExtApproved)),
                     ...community.filter(inSection(SECTIONS.ftExtApproved))
                 ],
-                [...mods, ...community.filter(inSection(SECTIONS.ftModApproved))],
+                [
+                    ...mods.filter(inSection(SECTIONS.ftModApproved)),
+                    ...community.filter(inSection(SECTIONS.ftModApproved))
+                ],
                 community.filter(inSection(SECTIONS.ftExtCommunity)),
                 community.filter(inSection(SECTIONS.ftModCommunity)),
                 builtins.filter(inSection(SECTIONS.turbowarp))

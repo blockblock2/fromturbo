@@ -5,6 +5,7 @@ A fast Scratch editor with mods built in. fromturbo has everything TurboWarp has
 - **Scratchity**: describe what you want and it writes the blocks for you
 - **Scratch Colab**: edit one project together, live
 - **.scratchpack**: open and save your game archives
+- **ESP32**: blocks that control an ESP32 board over USB or Bluetooth
 - **Mods**: change the editor itself, with a simple API anyone can use
 - **Community mods and extensions**: browse, install and publish them
 - **A Mac app** through BananaPeel
@@ -21,18 +22,19 @@ Website: **https://fromturbo.pages.dev** · Editor: **https://fromturbo.pages.de
 4. [Scratch Colab](#4-scratch-colab)
 5. [.scratchpack](#5-scratchpack)
 6. [Embedding a project](#6-embedding-a-project)
-7. [The Mods panel](#7-the-mods-panel)
-8. [The extension library and its sections](#8-the-extension-library-and-its-sections)
-9. [Publishing mods and extensions](#9-publishing-mods-and-extensions)
-10. [Approving (admins)](#10-approving-admins)
-11. [Making a mod](#11-making-a-mod)
-12. [Making an extension](#12-making-an-extension)
-13. [Mod API reference](#13-mod-api-reference)
-14. [The Mac app](#14-the-mac-app)
-15. [Running the website](#15-running-the-website)
-16. [How it's put together](#16-how-its-put-together)
-17. [Privacy and safety](#17-privacy-and-safety)
-18. [License](#license)
+7. [ESP32 boards](#7-esp32-boards)
+8. [The Mods panel](#8-the-mods-panel)
+9. [The extension library and its sections](#9-the-extension-library-and-its-sections)
+10. [Publishing mods and extensions](#10-publishing-mods-and-extensions)
+11. [Approving (admins)](#11-approving-admins)
+12. [Making a mod](#12-making-a-mod)
+13. [Making an extension](#13-making-an-extension)
+14. [Mod API reference](#14-mod-api-reference)
+15. [The Mac app](#15-the-mac-app)
+16. [Running the website](#16-running-the-website)
+17. [How it's put together](#17-how-its-put-together)
+18. [Privacy and safety](#18-privacy-and-safety)
+19. [License](#license)
 
 ---
 
@@ -146,7 +148,38 @@ Changing the size or the tick box updates the code without saving again. The emb
 
 ---
 
-## 7. The Mods panel
+## 7. ESP32 boards
+
+The **ESP32** extension lets a project control an ESP32 board: turn pins and LEDs on and off, dim LEDs, point servos, read buttons, knobs and touch pins, and send messages back and forth. It works over **USB** or **Bluetooth** in **Chrome or Edge on a computer** (Safari, Firefox and phones can't reach USB or Bluetooth devices).
+
+**Add it:** Add Extension → **ESP32** (in *fromturbo extensions ✓*). An **ESP32** button appears in the menu bar while the project uses it.
+
+**Set up the board (once).** The board needs fromturbo's small program on it. Pick one:
+
+- **MicroPython (no Arduino needed):** put [MicroPython](https://micropython.org/download/?mcu=esp32) on the board, plug it in, then ESP32 panel → **Install to board** and pick its port. fromturbo copies `main.py` over and restarts it.
+- **Arduino IDE:** Boards Manager → install **esp32 by Espressif Systems**. ESP32 panel → **Download Arduino sketch**, open it, pick your board and port, **Upload**.
+
+**Connect:** ESP32 panel → **Connect USB** or **Connect Bluetooth** (the board shows up as *fromturbo ESP32*). The browser only shows its device list after a click, so the **connect to ESP32** block reconnects a board you picked before, and otherwise opens the panel for you.
+
+| Block | What it does |
+| --- | --- |
+| **connect to ESP32 over (USB / Bluetooth)** | Connects, waiting until it's done |
+| **turn pin (2) (on / off)** | Digital output |
+| **turn built-in LED (on / off)** | The LED on the board (pin 2 on most boards) |
+| **set pin (2) brightness to (50) %** | PWM, for dimming LEDs or motor speed |
+| **point servo on pin (18) to (90) degrees** | Hobby servos (0–180°) |
+| **set pin (4) to (output / input / input with pull-up)** | Use *input with pull-up* for a button wired to GND |
+| **when pin (4) turns (on / off)** | Fires when a button is pressed or released |
+| **pin (4) is on?** · **analog value of pin (34)** · **touch value of pin (4)** | Read a pin (analog is 0–4095) |
+| **send [ping] to ESP32** · **when ESP32 sends [pong]** · **message from ESP32** | Messages to and from your own board code |
+
+**Your own board code:** the sketch has `onMessage()` and `sendToScratch()`; `main.py` has `on_message()` and `send_to_scratch()`. Out of the box, sending `ping` answers `pong`.
+
+Works with ESP32, S3, C3 and C6 boards. The ESP32-S2 has no Bluetooth, so it's USB only. The firmware is in `src/fromturbo/mods/esp32/firmware/`.
+
+---
+
+## 8. The Mods panel
 
 Click **Mods**. From top to bottom:
 
@@ -155,7 +188,7 @@ Click **Mods**. From top to bottom:
 **Community.** Mods and extensions other people published. Each one shows a small note saying which section it's in, its description, and who published it (their Scratch username).
 - **Install** (mods): installs it; it loads every time you open fromturbo.
 - **Add** (extensions): adds its blocks to the project you have open.
-- **🍌 Upload a mod** and **🧩 Publish an extension** (see [section 9](#9-publishing-mods-and-extensions)).
+- **🍌 Upload a mod** and **🧩 Publish an extension** (see [section 10](#10-publishing-mods-and-extensions)).
 
 **Install a mod from a URL.** Paste a link to a mod's `.js` file and press **Install**.
 
@@ -167,7 +200,7 @@ Click **Mods**. From top to bottom:
 
 ---
 
-## 8. The extension library and its sections
+## 9. The extension library and its sections
 
 Click the **Add Extension** button (bottom-left of the editor). Along the top is a filter button for each section, and **every card has a small note** above its name saying which section it's in.
 
@@ -175,7 +208,7 @@ Click the **Add Extension** button (bottom-left of the editor). Along the top is
 | --- | --- | --- |
 | **Scratch** | Scratch · Extension | Scratch's own extensions (Pen, Music, Video Sensing…) |
 | **TurboWarp** | TurboWarp · Extension | TurboWarp's extras (Custom Reporters, custom extensions) and TurboWarp's extension gallery |
-| **fromturbo extensions ✓** | fromturbo · Approved extension | fromturbo Blocks, plus community extensions an admin approved |
+| **fromturbo extensions ✓** | fromturbo · Approved extension | fromturbo Blocks, ESP32, plus community extensions an admin approved |
 | **fromturbo mods ✓** | fromturbo · Approved mod | Scratchity, Scratch Colab, .scratchpack, plus approved community mods |
 | **Community extensions** | fromturbo · Community extension | Extensions anyone published that aren't approved yet |
 | **Community mods** | fromturbo · Community mod | Mods anyone published that aren't approved yet |
@@ -188,7 +221,7 @@ Clicking a card:
 
 ---
 
-## 9. Publishing mods and extensions
+## 10. Publishing mods and extensions
 
 You can publish from anywhere: the website, the DMG Mac app or the installed Mac app.
 
@@ -210,7 +243,7 @@ The panel shows **Publishing as @yourname** with a **Sign out** link.
 
 ---
 
-## 10. Approving (admins)
+## 11. Approving (admins)
 
 Admins are the Scratch usernames in `ADMINS` in `wrangler.toml` (by default **blockblock2**).
 
@@ -223,7 +256,7 @@ To add another admin, add their Scratch username to `ADMINS` (comma-separated) a
 
 ---
 
-## 11. Making a mod
+## 12. Making a mod
 
 A **mod** changes the editor: buttons, panels, tools. It's one `.js` file:
 
@@ -242,7 +275,7 @@ fromturbo.mods.register({
 
 **Try it:** open the editor, press **⌘⌥J** (Chrome) or **⌘⌥C** (Safari) for the console, paste the code, press Enter. A **Hello** button appears.
 
-**Share it:** publish it (section 9), host the file anywhere and share the `?mod=` link, or have people paste its link into **Install a mod from a URL**.
+**Share it:** publish it (section 10), host the file anywhere and share the `?mod=` link, or have people paste its link into **Install a mod from a URL**.
 
 A bigger example is at https://fromturbo.pages.dev/mods/example-mod.js.
 
@@ -256,7 +289,7 @@ A bigger example is at https://fromturbo.pages.dev/mods/example-mod.js.
 
 ---
 
-## 12. Making an extension
+## 13. Making an extension
 
 An **extension** adds new blocks. It's the standard Scratch/TurboWarp custom extension format, so it works in TurboWarp too:
 
@@ -314,7 +347,7 @@ A bigger example is at https://fromturbo.pages.dev/mods/example-extension.js.
 
 ---
 
-## 13. Mod API reference
+## 14. Mod API reference
 
 Your mod's `run (api, {storage})` gets everything below. It's also on `window.fromturbo`.
 
@@ -394,7 +427,7 @@ Returning a function from `run()` still works. Blocks from `api.extensions.defin
 
 ---
 
-## 14. The Mac app
+## 15. The Mac app
 
 fromturbo runs as a real Mac app through [BananaPeel](https://www.npmjs.com/package/@blockblock2/bananapeel). The app is the `main` branch of **blockblock2/fromturbo-app**.
 
@@ -417,7 +450,7 @@ In the Mac app:
 
 ---
 
-## 15. Running the website
+## 16. Running the website
 
 The site is Cloudflare Pages (static files) plus Pages Functions (`functions/`). Everything is configured in `wrangler.toml`.
 
@@ -452,13 +485,13 @@ NODE_ENV=production npm run build      # output goes to build/
 
 ---
 
-## 16. How it's put together
+## 17. How it's put together
 
 | Part | Where |
 | --- | --- |
 | Mod API and boot | `src/fromturbo/api.js`, `src/fromturbo/index.js` |
 | Panels, buttons, toasts | `src/fromturbo/ui.js` |
-| Built-in mods | `src/fromturbo/mods/` (scratchity, colab, scratchpack, embed) |
+| Built-in mods | `src/fromturbo/mods/` (scratchity, colab, scratchpack, embed, esp32) |
 | Community items, publishing, sign-in | `src/fromturbo/community.js` |
 | Sections and card notes | `src/fromturbo/sections.js`, `src/containers/extension-library.jsx` |
 | Embed address rules (auto-run extensions) | `src/fromturbo/embed-host.js`, `src/containers/tw-security-manager.jsx` |
@@ -484,7 +517,7 @@ NODE_ENV=production npm run build      # output goes to build/
 
 ---
 
-## 17. Privacy and safety
+## 18. Privacy and safety
 
 - **Mods and extensions can do anything** in the editor and to your project. Community items aren't checked by anyone until approved, so only install ones you trust.
 - **Embeds run the project's custom extensions automatically**, on the separate address `embed.fromturbo.pages.dev`, where they can't reach your editor's data. Only embed projects you'd be happy for anyone to download.

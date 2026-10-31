@@ -139,7 +139,7 @@ export default {
                     log.textContent = board.log.slice(-14).join('\n') || 'Nothing yet.';
                 };
 
-                body.append(
+                body.append(...[
                     h('div', {className: 'ft-esp-status'}, dot, statusText),
                     noSupport ? h('div', {className: 'ft-esp-error'},
                         'This browser can\'t reach USB or Bluetooth devices. Open fromturbo.pages.dev in Chrome or Edge on a computer.') : null,
@@ -160,7 +160,7 @@ export default {
                     h('details', {},
                         h('summary', {}, 'What the board is saying'),
                         log)
-                );
+                ].filter(Boolean));
                 draw();
                 const offs = [board.on('status', draw), board.on('log', draw), api.on('targetsUpdate', draw)];
                 return () => offs.forEach(off => off());
@@ -181,7 +181,8 @@ export default {
                 removeButton = null;
             }
         };
-        const onExtensionAdded = () => syncButton();
+        // The VM announces the extension a moment before it counts it as loaded.
+        const onExtensionAdded = () => api.after(0, syncButton);
         vm.runtime.on('EXTENSION_ADDED', onExtensionAdded);
         api.onCleanup(() => vm.runtime.off('EXTENSION_ADDED', onExtensionAdded));
         api.on('projectLoaded', syncButton);

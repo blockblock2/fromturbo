@@ -1,8 +1,6 @@
 // Community mods and extensions.
 // Everyone can browse and install them (Mods panel and the extension library).
-// Publishing is exclusive to the BananaPeel DMG version of the Mac app
-// (BananaPeel's window sets window.bananapeel.kind to "dmg" or "installed"),
-// and needs a Scratch Auth sign-in. Everything is credited to the uploader's
+// Anyone can publish from anywhere (website or Mac app) after a Scratch Auth sign-in. Everything is credited to the uploader's
 // Scratch username only, never a real name. Admins can approve items.
 
 import {sectionFor} from './sections';
@@ -12,9 +10,6 @@ const ORIGIN = location.protocol === 'file:' ? SITE : location.origin;
 const API = `${ORIGIN}/api/mods`;
 const AUTH = `${ORIGIN}/api/auth`;
 const TOKEN_KEY = 'fromturbo.scratchAuth';
-
-const bananaPeelKind = () => (window.bananapeel && typeof window.bananapeel === 'object' ? window.bananapeel.kind : null);
-const canPublish = () => bananaPeelKind() === 'dmg';
 
 const store = {
     get () {
@@ -227,20 +222,18 @@ const communitySection = api => {
         return btn;
     };
 
-    const publish = canPublish() ?
-        h('div', {className: 'ft-row'},
-            publishButton('mod', '🍌 Upload a mod'),
-            publishButton('extension', '🧩 Publish an extension')) :
-        h('div', {className: 'ft-muted'}, 'Publish mods and extensions from the fromturbo DMG app.');
-    if (canPublish()) showWho();
+    const publish = h('div', {className: 'ft-row'},
+        publishButton('mod', '🍌 Upload a mod'),
+        publishButton('extension', '🧩 Publish an extension'));
+    showWho();
 
     refresh();
     return h('div', {className: 'ft-list'},
         h('strong', {}, 'Community'),
         publish,
-        canPublish() ? who : null,
+        who,
         list,
         status);
 };
 
-export {communitySection, canPublish, fetchItems, installItem, API as MODS_API};
+export {communitySection, fetchItems, installItem, API as MODS_API};

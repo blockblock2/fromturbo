@@ -354,7 +354,7 @@ jump (args, util) {
 <section>
   <h2>Sharing your extension</h2>
   <table>
-    <tr><td><b>Publish it</b></td><td>In the fromturbo DMG app: <b>Mods → 🧩 Publish an extension</b>, pick your file. It shows up for everyone (see <a href="#share">Share it with everyone</a>).</td></tr>
+    <tr><td><b>Publish it</b></td><td>In fromturbo (website or app): <b>Mods → 🧩 Publish an extension</b>, pick your file. It shows up for everyone (see <a href="#share">Share it with everyone</a>).</td></tr>
     <tr><td><b>A link</b></td><td>Host the <code>.js</code> file anywhere, then send <code>fromturbo.pages.dev/editor.html?extension=YOUR_URL</code>. It opens the editor with your extension loaded (people are asked first if it's unsandboxed).</td></tr>
     <tr><td><b>In a project</b></td><td>Projects remember extensions loaded from a link and load them again when opened. Extensions pasted as text are saved inside the project.</td></tr>
   </table>
@@ -395,10 +395,8 @@ jump (args, util) {
 
 <section id="share">
   <h2>Share it with everyone</h2>
-  <p>In the fromturbo DMG app, open <b>Mods</b> and press <b>🍌 Upload a mod</b> or <b>🧩 Publish an extension</b>, then pick your <code>.js</code> file. It shows up for everyone in the Mods panel and in the extension library.</p>
+  <p>In fromturbo (the website or the Mac app), open <b>Mods</b> and press <b>🍌 Upload a mod</b> or <b>🧩 Publish an extension</b>, then pick your <code>.js</code> file. It shows up for everyone in the Mods panel and in the extension library.</p>
   <p>The first time, it asks you to sign in with Scratch (Scratch Auth). What you publish is credited to your Scratch username, never a real name.</p>
-  <p>Get the DMG app with <a href="https://www.npmjs.com/package/@blockblock2/bananapeel">BananaPeel</a> (the version from <code>bananapeel install</code> can't publish):</p>
-<pre><code>bananapeel dmg blockblock2/fromturbo-app</code></pre>
   <h3>Sections</h3>
   <p>The extension library has a filter button for each section, and every card has a small note saying which one it's in:</p>
   <table>

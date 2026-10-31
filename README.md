@@ -40,9 +40,9 @@ Website: **https://fromturbo.pages.dev** · Editor: **https://fromturbo.pages.de
 
 | Way | What you get | How |
 | --- | --- | --- |
-| **Website** | Everything except publishing | Open https://fromturbo.pages.dev/editor.html |
-| **Mac app (DMG)** | Everything, **including 🍌 Upload a mod and 🧩 Publish an extension** | `bananapeel dmg blockblock2/fromturbo-app`, then drag fromturbo into Applications |
-| **Mac app (installed)** | Everything except publishing | `bananapeel install blockblock2/fromturbo-app`, or **Download** in the BananaPeel Store |
+| **Website** | Everything | Open https://fromturbo.pages.dev/editor.html |
+| **Mac app (DMG)** | Everything | `bananapeel dmg blockblock2/fromturbo-app`, then drag fromturbo into Applications |
+| **Mac app (installed)** | Everything | `bananapeel install blockblock2/fromturbo-app`, or **Download** in the BananaPeel Store |
 
 The BananaPeel Store also has a **💿 Download DMG** button that does the same as `bananapeel dmg`.
 
@@ -155,7 +155,7 @@ Click **Mods**. From top to bottom:
 **Community.** Mods and extensions other people published. Each one shows a small note saying which section it's in, its description, and who published it (their Scratch username).
 - **Install** (mods): installs it; it loads every time you open fromturbo.
 - **Add** (extensions): adds its blocks to the project you have open.
-- In the DMG app: **🍌 Upload a mod** and **🧩 Publish an extension** (see [section 9](#9-publishing-mods-and-extensions)).
+- **🍌 Upload a mod** and **🧩 Publish an extension** (see [section 9](#9-publishing-mods-and-extensions)).
 
 **Install a mod from a URL.** Paste a link to a mod's `.js` file and press **Install**.
 
@@ -190,7 +190,7 @@ Clicking a card:
 
 ## 9. Publishing mods and extensions
 
-Publishing only works in the **DMG version of the Mac app** (see [section 14](#14-the-mac-app)).
+You can publish from anywhere: the website, the DMG Mac app or the installed Mac app.
 
 1. Open **Mods**.
 2. Press **🍌 Upload a mod** or **🧩 Publish an extension**.
@@ -214,7 +214,7 @@ The panel shows **Publishing as @yourname** with a **Sign out** link.
 
 Admins are the Scratch usernames in `ADMINS` in `wrangler.toml` (by default **blockblock2**).
 
-- Sign in through a publish button in the DMG app. The panel says **(admin)** next to your name.
+- Sign in through a publish button (anywhere). The panel says **(admin)** next to your name.
 - Every community item in the Mods panel gets an **Approve** button. Approving moves it into **fromturbo extensions ✓** or **fromturbo mods ✓**.
 - Approved items get **Unapprove**, which moves them back to Community.
 - **Anything an admin publishes is approved automatically.**
@@ -401,7 +401,7 @@ fromturbo runs as a real Mac app through [BananaPeel](https://www.npmjs.com/pack
 ```bash
 npm install -g @blockblock2/bananapeel
 bananapeel key <your-cloudmersive-api-key>        # once; free at portal.cloudmersive.com
-bananapeel dmg blockblock2/fromturbo-app          # DMG version (can publish)
+bananapeel dmg blockblock2/fromturbo-app          # DMG version
 bananapeel install blockblock2/fromturbo-app      # installed version (can't publish)
 ```
 

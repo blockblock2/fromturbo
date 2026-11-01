@@ -12,8 +12,16 @@ const onEmbedHost = () => typeof location !== 'undefined' && /^embed\./i.test(lo
 export const autoRunExtensions = () => onEmbedHost() &&
     /\/embed(\.html)?$/i.test(location.pathname);
 
-/** The editor and home page don't belong on the embed address: send people to the main site. */
+/**
+ * On the embed address, the bare address is the player: embed.fromturbo.pages.dev/#123456
+ * (and /123456) play that Scratch project. Every other page, like the editor, belongs on
+ * the main site, so people are sent there.
+ */
 export const leaveEmbedHost = () => {
+    if (onEmbedHost() && /^\/(index\.html)?$/i.test(location.pathname)) {
+        location.replace(`/embed.html${location.search}${location.hash}`);
+        return true;
+    }
     if (onEmbedHost() && !autoRunExtensions()) {
         location.replace(`${MAIN_SITE}${location.pathname}${location.search}${location.hash}`);
         return true;

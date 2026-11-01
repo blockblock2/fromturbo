@@ -158,6 +158,8 @@ Packs without a `manifest.json` still work: fromturbo finds the `.sb3` files ins
 
 Changing the size or the tick box updates the code without saving again. The embed is a copy of the project **as it was when you clicked the button**: after changing the project, click **Make a new embed** and replace the code.
 
+**Embedding a project that's on Scratch:** you don't need the button. Use `https://embed.fromturbo.pages.dev/#<project number>` (or `/<project number>`), for example `https://embed.fromturbo.pages.dev/#1387249499`. It opens the player for that shared Scratch project, and its custom extensions run by themselves too. In an `<iframe>`, use `https://embed.fromturbo.pages.dev/embed.html#<project number>`.
+
 **Why custom extensions can run by themselves:** embeds play on their own address, `embed.fromturbo.pages.dev`. Browsers keep each address's data apart, so an extension running there can't reach anyone's fromturbo editor, mods, settings or sign-in. Only the embed page runs there; anything else on that address sends you to `fromturbo.pages.dev`. On the main address, extensions still ask first, as usual.
 
 **Limits:** projects up to 8 MB, and 20 embeds per person per day. Saved copies are public files in the `fromturbo-mods` repo (folder `projects/`), so anyone with the link can download them.

@@ -95,21 +95,37 @@ The default colour is blue. Change it in **Settings → Accent colour**.
 **How to use it:**
 
 1. Click **Colab**.
-2. The **Firebase Realtime Database URL** is filled in already with fromturbo's shared database (`https://colab-e77ed-default-rtdb.firebaseio.com`), so you can skip this. To use your own instead, paste its URL (`https://<project>-default-rtdb.firebaseio.com`). Everyone in a room must use the same one.
-3. Type your name and a **room code**.
-4. The first person presses **Start room with my project**. Everyone else types the same room code and presses **Join room**.
+2. The **Firebase Realtime Database URL** is filled in already with fromturbo's shared database (`https://colab-e77ed-default-rtdb.firebaseio.com`), so you can skip this. To use your own, paste its URL instead. Everyone in a room must use the same one.
+3. Type your name (or leave it empty to show up as "Scratcher 123").
+4. One person presses **Start a colab with my project**. The panel shows a 10-character **room code** with a **Copy** button.
+5. Everyone else pastes that code and presses **Join**. They get the project straight away.
 
-The panel shows who's in the room. **Leave** disconnects you.
+The panel shows who's in the room and which sprite each person is editing, plus a short list of what everyone changed. **Leave** disconnects you.
 
-**How syncing works:** a second after someone stops editing, the whole project (with all costumes and sounds) is sent to the room, and everyone else gets it. If two people change things at the same moment, the last save wins, so it works best when people edit different sprites. Projects over 9 MB can't sync.
+**How syncing works:** only what changes is sent. Edit a script and just that script goes to everyone (a few hundred bytes), and it appears in their code area in about a second, without reloading the project. Variables, lists and messages sync one at a time. When a sprite's costumes or sounds change, or a sprite is added or deleted, that sprite is sent. If two people change the same script at the same moment, the last change wins, so it works best when people edit different scripts.
 
-**Setting up your own database** (optional, once): in the Firebase console, create a Realtime Database and give it these rules (the shared one needs them too):
+**Send my version to everyone** replaces everyone's copy with yours. Use it after changing backdrops (they don't sync live), or if copies ever drift apart.
+
+**Works with the Scratch Colab Chrome extension:** it's the same rooms, so someone on fromturbo and someone using the extension on scratch.mit.edu can edit together. Both need the same database URL.
+
+**Setting up a database** (once): in the Firebase console, create a Realtime Database, open **Rules**, replace everything with these rules and press **Publish**:
 
 ```json
-{ "rules": { "fromturbo-colab": { "$room": { ".read": true, ".write": true } } } }
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$code": {
+        ".read": "$code.length >= 10",
+        ".write": "$code.length >= 10"
+      }
+    }
+  }
+}
 ```
 
-Anyone with the room code can edit that room, so use codes that are hard to guess.
+Anyone with a room code can edit that room, so only share it with your team.
 
 ---
 
@@ -523,7 +539,7 @@ NODE_ENV=production npm run build      # output goes to build/
 - **Embeds run the project's custom extensions automatically**, on the separate address `embed.fromturbo.pages.dev`, where they can't reach your editor's data. Only embed projects you'd be happy for anyone to download.
 - Publishing stores only your **Scratch username**, never a real name.
 - Scratchity sends your description and the selected sprite's variable, costume and sound names to fromturbo's server and Cloudflare Workers AI. Nothing else from the project.
-- Colab sends the whole project to the Firebase database in the panel (fromturbo's shared one unless you change it).
+- Colab sends the project, then each change, to the Firebase database in the panel (fromturbo's shared one unless you change it). Anyone with the room code can read it.
 - Loading Scratch projects, cloud variables and the TurboWarp extension gallery use TurboWarp's servers.
 - Full details: https://fromturbo.pages.dev/privacy.html
 

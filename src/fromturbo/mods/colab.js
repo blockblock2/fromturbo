@@ -32,6 +32,23 @@ const randomRoom = () => Math.random().toString(36)
 const clientId = Math.random().toString(36)
     .slice(2, 12);
 
+/** Turns a failed Firebase response into a message that says what to fix. */
+const firebaseProblem = async res => {
+    const data = await res.json().catch(() => ({}));
+    const said = String(data.error || '');
+    if (res.status === 401 || /permission denied/i.test(said)) {
+        return 'Firebase said "Permission denied". In the Firebase console, open Realtime Database → Rules ' +
+            'and allow the fromturbo-colab path (see the fromturbo guide), then Publish.';
+    }
+    if (res.status === 404 || /not found|doesn't exist|does not exist/i.test(said)) {
+        return 'There\'s no Realtime Database at that URL. Copy it from the Firebase console (Realtime Database → Data).';
+    }
+    if (res.status === 423 || /disabled|deactivated/i.test(said)) {
+        return 'That Firebase database is turned off.';
+    }
+    return `Firebase said ${res.status}${said ? `: ${said}` : ''}`;
+};
+
 export default {
     id: 'colab',
     name: 'Scratch Colab',
@@ -113,7 +130,15 @@ export default {
                 method: 'PUT',
                 body: JSON.stringify({name: storage.get('name', 'Someone'), seen: Date.now()})
             });
-            await me();
+            // Check the database answers before going further, so a wrong URL or missing
+            // rules show a clear message instead of "reconnecting…" forever.
+            let first;
+            try {
+                first = await me();
+            } catch (e) {
+                throw new Error('Couldn\'t reach that database. Check the URL.');
+            }
+            if (!first.ok) throw new Error(await firebaseProblem(first));
             session.heartbeat = setInterval(me, 20000);
 
             const existing = await (await fetch(dbURL('project/rev'))).json();
@@ -133,11 +158,26 @@ export default {
             };
             session.stream.addEventListener('put', handle);
             session.stream.addEventListener('patch', handle);
-            session.stream.onerror = () => setStatus('Connection dropped — reconnecting…');
+            session.stream.addEventListener('cancel', () => {
+                setStatus('Firebase stopped letting fromturbo read this room. Check the database rules.');
+                leave();
+            });
+            session.stream.onerror = () => {
+                if (session && session.stream.readyState === EventSource.CLOSED) {
+                    setStatus('Lost the connection to the database. Press Join room to try again.');
+                    leave();
+                } else {
+                    setStatus('Connection dropped — reconnecting…');
+                }
+            };
+            session.stream.onopen = () => setStatus(`In room "${room}"`);
             setStatus(`In room "${room}"`);
         };
 
         window.addEventListener('beforeunload', leave);
+
+        // fromturbo's shared database. People can paste their own instead.
+        const DEFAULT_DB = 'https://colab-e77ed-default-rtdb.firebaseio.com';
 
         const open = () => api.ui.openPanel({
             id: 'colab',
@@ -146,7 +186,7 @@ export default {
                 const dbInput = h('input', {
                     'type': 'url',
                     'placeholder': 'https://your-project-default-rtdb.firebaseio.com',
-                    'value': storage.get('db', ''),
+                    'value': storage.get('db', '') || DEFAULT_DB,
                     'aria-label': 'Firebase Realtime Database URL'
                 });
                 const nameInput = h('input', {'type': 'text', 'placeholder': 'Your name', 'value': storage.get('name', ''), 'aria-label': 'Your name'});
@@ -163,7 +203,7 @@ export default {
 
                 const go = async startWithMine => {
                     const db = dbInput.value.trim();
-                    if (!/^https:\/\/.+/.test(db)) return setStatus('Paste your Firebase Realtime Database URL first.');
+                    if (!/^https:\/\/.+/.test(db)) return setStatus('Paste a Firebase Realtime Database URL first.');
                     let room = cleanRoom(roomInput.value);
                     if (!room) room = randomRoom();
                     roomInput.value = room;

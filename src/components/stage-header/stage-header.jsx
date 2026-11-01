@@ -119,7 +119,7 @@ const StageHeaderComponent = function (props) {
                     />
                 </Button>
             </div>
-        ) : FullscreenAPI.available() ? (
+        ) : (FullscreenAPI.available() && !isEmbedded) ? ( // fromturbo: no full screen button in embeds
             <div className={styles.unselectWrapper}>
                 <Button
                     className={styles.stageButton}
